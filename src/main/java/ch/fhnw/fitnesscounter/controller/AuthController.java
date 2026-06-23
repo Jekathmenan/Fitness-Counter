@@ -17,6 +17,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void register(@Valid @RequestBody RegisterRequest registerRequest) {
+        authService.register(registerRequest);
+    }
+
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);

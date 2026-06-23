@@ -21,7 +21,47 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * Diese Methode registriert einen neuen Benutzer.
+     *
+     * @param registerRequest
+     */
+    public void register (RegisterRequest registerRequest) {
+        // Prüfe, ob Passwörter übereinstimmen
+        if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword()))
+            throw new IllegalArgumentException("Passwörter müssen übereinstimmen");
+
+        // Prüfe, ob die E-Mail-Adresse vergeben ist
+        if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
+            throw new RuntimeException("E-Mail ist bereits vergeben");
+        }
+
+        // Speichere den Benutzer in der Datenbank.
+        User user = User.builder()
+                .firstName(registerRequest.firstName())
+                .lastName(registerRequest.lastName())
+                .email(registerRequest.email())
+                .password(passwordEncoder.encode(registerRequest.password()))
+                .role(Role.USER)
+                .build();
+
+        userRepository.save(user);
+    }
+
+    /**
+     *
+     * Diese Methode ist für das Einloggen des Benutzers und zurückgeben des Login-Tokens zuständig.
+     *
+     * @param loginRequest
+     * @return
+     */
     public LoginResponse login(LoginRequest loginRequest) {
+        // Prüfe ob der user existiert
+        User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(
+                () -> new RuntimeException("User nicht gefunden"));
+
+        // Melde den Benutzer an
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.email(),
@@ -29,12 +69,8 @@ public class AuthService {
                 )
         );
 
-        User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(
-                () -> new RuntimeException("User nicht gefunden"));
-
-
+        // Generiere den AuthToken und gebe ihn zurück
         String token = tokenService.generateToken(authentication, user.isResetPassword());
-
         return new LoginResponse(token, user.isResetPassword());
     }
 }
