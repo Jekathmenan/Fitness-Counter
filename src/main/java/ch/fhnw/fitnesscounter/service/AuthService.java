@@ -1,7 +1,9 @@
 package ch.fhnw.fitnesscounter.service;
 
 import ch.fhnw.fitnesscounter.dto.auth.*;
+import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.auth.*;
+import ch.fhnw.fitnesscounter.repository.PasswordResetTokenRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,10 +11,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AuthService {
 
@@ -20,6 +25,8 @@ public class AuthService {
     private final TokenService tokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final MailService mailService;
 
     /**
      *
@@ -93,5 +100,54 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setResetPassword(false);
         userRepository.save(user);
+    }
+
+    /**
+     *
+     * Sendet die Reset Password Link per E-Mail
+     *
+     * @param email
+     */
+    public void sendResetPasswordEmail (String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+
+        // Lösche allfällige alte Tokens
+        tokenRepository.deleteByUser(user);
+        tokenRepository.flush();
+
+        // Generiere ein neues Reset-Token
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken(token, user);
+        tokenRepository.save(resetToken);
+
+        mailService.sendResetMail(user.getEmail(), token);
+    }
+
+    /**
+     *
+     * Diese Methode setzt das Passwort des Benutzers zurück.
+     *
+     * @param request
+     */
+    public void resetPassword(ResetPasswordRequest request) {
+        // Validiere eingegebenen Passwörter
+        if (!Objects.equals(request.newPassword(), request.retypePassword()))
+            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
+
+        // Prüfe den resetToken
+        PasswordResetToken resetToken = tokenRepository.findByToken(request.token()).orElseThrow(()
+                -> new IllegalArgumentException("Ungültiger oder abgelaufener Token"));
+
+        if (resetToken.isExpired()) {
+            tokenRepository.delete(resetToken);
+            throw new FitnessAPIException("Token ist abgelaufen");
+        }
+
+        // Setzt das Passwort zurück
+        User user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setResetPassword(false);
+        userRepository.save(user);
+        tokenRepository.delete(resetToken);
     }
 }

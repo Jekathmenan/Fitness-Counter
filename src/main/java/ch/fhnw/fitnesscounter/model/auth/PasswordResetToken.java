@@ -27,4 +27,8 @@ public class PasswordResetToken {
         this.user = user;
         this.expiryDate = LocalDateTime.now().plusMinutes(15);
     }
+
+    public boolean isExpired() {
+        return expiryDate.isBefore(LocalDateTime.now());
+    }
 }

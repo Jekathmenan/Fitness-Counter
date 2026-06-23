@@ -32,4 +32,16 @@ public class AuthController {
     public void updatePassword(@Valid @RequestBody UpdatePasswordRequest request, Principal principal) {
         authService.updateInitialPassword(principal.getName(), request);
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestParam String email) {
+        authService.sendResetPasswordEmail(email);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword (@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.accepted().build();
+    }
 }
