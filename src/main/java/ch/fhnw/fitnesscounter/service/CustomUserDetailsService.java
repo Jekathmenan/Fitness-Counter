@@ -1,5 +1,6 @@
 package ch.fhnw.fitnesscounter.service;
 
+import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,6 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User nicht gefunden: " + email));
+                .orElseThrow(() -> new FitnessAPIException("User nicht gefunden: " + email));
     }
 }

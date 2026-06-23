@@ -37,11 +37,11 @@ public class AuthService {
     public void register (RegisterRequest registerRequest) {
         // Prüfe, ob Passwörter übereinstimmen
         if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword()))
-            throw new IllegalArgumentException("Passwörter müssen übereinstimmen");
+            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
 
         // Prüfe, ob die E-Mail-Adresse vergeben ist
         if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
-            throw new RuntimeException("E-Mail ist bereits vergeben");
+            throw new FitnessAPIException("E-Mail ist bereits vergeben");
         }
 
         // Speichere den Benutzer in der Datenbank.
@@ -66,7 +66,7 @@ public class AuthService {
     public LoginResponse login(LoginRequest loginRequest) {
         // Prüfe ob der user existiert
         User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(
-                () -> new RuntimeException("User nicht gefunden"));
+                () -> new FitnessAPIException("User nicht gefunden"));
 
         // Melde den Benutzer an
         Authentication authentication = authenticationManager.authenticate(
@@ -91,10 +91,10 @@ public class AuthService {
      */
     public void updateInitialPassword (String email, UpdatePasswordRequest request) {
         if (!Objects.equals(request.newPassword(), request.retypePassword()))
-            throw new IllegalArgumentException("Passwörter müssen übereinstimmen");
+            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
 
         // Suche den Benutzer in der Datenbank
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("User nicht gefunden"));
 
         // Setze das neue Passwort
         user.setPassword(passwordEncoder.encode(request.newPassword()));
@@ -109,7 +109,7 @@ public class AuthService {
      * @param email
      */
     public void sendResetPasswordEmail (String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("User nicht gefunden"));
 
         // Lösche allfällige alte Tokens
         tokenRepository.deleteByUser(user);
@@ -136,7 +136,7 @@ public class AuthService {
 
         // Prüfe den resetToken
         PasswordResetToken resetToken = tokenRepository.findByToken(request.token()).orElseThrow(()
-                -> new IllegalArgumentException("Ungültiger oder abgelaufener Token"));
+                -> new FitnessAPIException("Ungültiger oder abgelaufener Token"));
 
         if (resetToken.isExpired()) {
             tokenRepository.delete(resetToken);
