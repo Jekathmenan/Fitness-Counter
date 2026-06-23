@@ -1,5 +1,10 @@
 package ch.fhnw.fitnesscounter.config;
 
+import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +23,25 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    /**
+     *
+     * Diese Methode fängt allgemeine Fehler
+     *
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleAllUncaughtErrors(Exception ex) {
+        // Logge den Fehler
+        logger.error("Unerwarteter Fehler aufgetreten: ", ex);
+
+        // Generische Meldung zurückgeben
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Ein interner Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 
     /**
      *
@@ -39,27 +63,14 @@ public class GlobalExceptionHandler {
 
     /**
      *
-     * Fängt IllegalArgumentExceptions ab
+     * Fängt FitnessAPIException ab und gibt sie so weiter.
+     * Alle anderen Exceptions unterdrückt.
      *
      * @param ex
      * @return
      */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
-    }
-
-    /**
-     *
-     * Fängt allgemeine RuntimeExceptions ab
-     *
-     * @param ex
-     * @return
-     */
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntime(RuntimeException ex) {
+    @ExceptionHandler(FitnessAPIException.class)
+    public ResponseEntity<Map<String, String>> handleRuntime(FitnessAPIException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.badRequest().body(error);
