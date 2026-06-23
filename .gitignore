@@ -33,4 +33,4 @@ build/
 .vscode/
 
 # Lokale Konfigurationen ignorieren
-src/main/resources/application-local.properties
+**/application-local.properties
