@@ -27,4 +27,9 @@ public class AuthController {
     public LoginResponse login(@Valid @RequestBody LoginRequest loginRequest) {
         return authService.login(loginRequest);
     }
+
+    @PostMapping("/update-password")
+    public void updatePassword(@Valid @RequestBody UpdatePasswordRequest request, Principal principal) {
+        authService.updateInitialPassword(principal.getName(), request);
+    }
 }

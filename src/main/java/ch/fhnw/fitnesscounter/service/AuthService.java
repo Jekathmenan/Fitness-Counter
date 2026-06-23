@@ -73,4 +73,25 @@ public class AuthService {
         String token = tokenService.generateToken(authentication, user.isResetPassword());
         return new LoginResponse(token, user.isResetPassword());
     }
+
+    /**
+     *
+     * Diese Methode ist für das Zurücksetzen des ursprünglich vom System vergebenem Passwort
+     * des Adminbenutzers zuständig.
+     *
+     * @param email
+     * @param request
+     */
+    public void updateInitialPassword (String email, UpdatePasswordRequest request) {
+        if (!Objects.equals(request.newPassword(), request.retypePassword()))
+            throw new IllegalArgumentException("Passwörter müssen übereinstimmen");
+
+        // Suche den Benutzer in der Datenbank
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User nicht gefunden"));
+
+        // Setze das neue Passwort
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        user.setResetPassword(false);
+        userRepository.save(user);
+    }
 }
