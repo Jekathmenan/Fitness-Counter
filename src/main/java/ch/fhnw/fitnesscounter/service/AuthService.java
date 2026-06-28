@@ -6,9 +6,11 @@ import ch.fhnw.fitnesscounter.model.auth.*;
 import ch.fhnw.fitnesscounter.repository.PasswordResetTokenRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -91,7 +93,7 @@ public class AuthService {
      */
     public void updateInitialPassword (String email, UpdatePasswordRequest request) {
         if (!Objects.equals(request.newPassword(), request.retypePassword()))
-            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
+            throw new FitnessAPIException("Passwörter stimmen nicht überein");
 
         // Suche den Benutzer in der Datenbank
         User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("User nicht gefunden"));
@@ -132,15 +134,15 @@ public class AuthService {
     public void resetPassword(ResetPasswordRequest request) {
         // Validiere eingegebenen Passwörter
         if (!Objects.equals(request.newPassword(), request.retypePassword()))
-            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
+            throw new FitnessAPIException("Passwörter stimmen nicht überein", HttpStatus.UNAUTHORIZED);
 
         // Prüfe den resetToken
         PasswordResetToken resetToken = tokenRepository.findByToken(request.token()).orElseThrow(()
-                -> new FitnessAPIException("Ungültiger oder abgelaufener Token"));
+                -> new FitnessAPIException("Der Reset-Token ist ungültig.", HttpStatus.UNAUTHORIZED));
 
         if (resetToken.isExpired()) {
             tokenRepository.delete(resetToken);
-            throw new FitnessAPIException("Token ist abgelaufen");
+            throw new FitnessAPIException("Der Reset-Token ist abgelaufen", HttpStatus.UNAUTHORIZED);
         }
 
         // Setzt das Passwort zurück
