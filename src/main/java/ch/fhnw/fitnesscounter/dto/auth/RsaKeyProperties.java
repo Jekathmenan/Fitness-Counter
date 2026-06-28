@@ -1,4 +1,4 @@
-package ch.fhnw.fitnesscounter.config;
+package ch.fhnw.fitnesscounter.dto.auth;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.security.interfaces.RSAPrivateKey;

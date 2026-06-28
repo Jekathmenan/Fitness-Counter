@@ -20,8 +20,15 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     *
+     * Diese Methode ist für das einmalige seeden der Datenbank mit einem Admin-Benutzer zuständig.
+     *
+     * @param args
+     */
     @Override
     public void run(String... args) {
+        // Erstelle den Admin-Benutzer, wenn dieser nicht schon existiert
         if (userRepository.findByEmail("admin@fitness.ch").isEmpty()) {
             User admin = User.builder()
                     .email("admin@fitness.ch")
