@@ -73,6 +73,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleRuntime(FitnessAPIException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
+        return ResponseEntity.status(ex.getStatus()).body(error);
     }
 }
