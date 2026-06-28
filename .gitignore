@@ -34,3 +34,5 @@ build/
 
 # Lokale Konfigurationen ignorieren
 **/application-local.properties
+# Logs ignorieren
+!**/src/logs/**/
