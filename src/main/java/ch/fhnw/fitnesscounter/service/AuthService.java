@@ -8,6 +8,7 @@ import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.repository.PasswordResetTokenRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@Slf4j
 @Transactional
 @RequiredArgsConstructor
 public class AuthService {
@@ -37,12 +39,15 @@ public class AuthService {
      * @param registerRequest
      */
     public void register (RegisterRequest registerRequest) {
+        log.info("Versuch einer Registrierung für E-Mail: {}", registerRequest.email());
+
         // Prüfe, ob Passwörter übereinstimmen
         if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword()))
             throw new FitnessAPIException("Passwörter müssen übereinstimmen");
 
         // Prüfe, ob die E-Mail-Adresse vergeben ist
-        if (userRepository.findByEmail(registerRequest.email()).isPresent()) {
+        if (userService.findByEmail(registerRequest.email()).isPresent()) {
+            log.warn("E-Mail ist bereits vergeben: {}", registerRequest.email());
             throw new FitnessAPIException("E-Mail ist bereits vergeben");
         }
 
@@ -55,7 +60,8 @@ public class AuthService {
                 .role(Role.USER)
                 .build();
 
-        userRepository.save(user);
+        userService.save(user);
+        log.info("User erfolgreich registriert: {}", registerRequest.email());
     }
 
     /**
