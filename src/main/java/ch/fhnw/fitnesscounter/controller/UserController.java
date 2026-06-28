@@ -17,6 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
     private final UserRepository userRepository;
 
+    /**
+     *
+     * Dieser Endpunkt gibt Profilinformationen eines Benutzers zurück.
+     *
+     * @param jwt
+     * @return
+     */
     @GetMapping("/me")
     public UserResponse getMyProfile(@AuthenticationPrincipal Jwt jwt) {
         String email = jwt.getSubject();

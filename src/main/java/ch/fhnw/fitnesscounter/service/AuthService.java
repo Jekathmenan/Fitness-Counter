@@ -2,7 +2,9 @@ package ch.fhnw.fitnesscounter.service;
 
 import ch.fhnw.fitnesscounter.dto.auth.*;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
-import ch.fhnw.fitnesscounter.model.auth.*;
+import ch.fhnw.fitnesscounter.model.auth.PasswordResetToken;
+import ch.fhnw.fitnesscounter.model.auth.Role;
+import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.repository.PasswordResetTokenRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -10,11 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Objects;
 import java.util.UUID;
 

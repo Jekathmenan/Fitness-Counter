@@ -10,6 +10,13 @@ import org.springframework.stereotype.Service;
 public class MailService {
     private final JavaMailSender mailSender;
 
+    /**
+     *
+     * Sendet Passwort Zurücksetzen E-Mails
+     *
+     * @param to
+     * @param token
+     */
     public void sendResetMail(String to, String token) {
         // TODO: Eine Möglichkeit überlegen, um diese URL dynamisch aufzubauen: https://URL_DER_FRONTENDAPP/reset-password?token=TOKEN.
         SimpleMailMessage message = new SimpleMailMessage();

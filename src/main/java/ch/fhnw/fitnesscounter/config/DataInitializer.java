@@ -40,7 +40,6 @@ public class DataInitializer implements CommandLineRunner {
                     .build();
 
             userRepository.save(admin);
-            System.out.println("--- Admin-User initialisiert ---");
         }
     }
 }

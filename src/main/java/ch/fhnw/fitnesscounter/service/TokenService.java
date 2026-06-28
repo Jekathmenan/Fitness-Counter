@@ -18,6 +18,14 @@ public class TokenService {
 
     private final JwtEncoder encoder;
 
+    /**
+     *
+     * Generiert Auth-Token für eine Anmeldung.
+     *
+     * @param authentication
+     * @param resetRequired
+     * @return
+     */
     public String generateToken(Authentication authentication, boolean resetRequired) {
         Instant now = Instant.now();
         String scope = authentication.getAuthorities().stream()

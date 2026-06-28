@@ -1,5 +1,6 @@
 package ch.fhnw.fitnesscounter.config;
 
+import ch.fhnw.fitnesscounter.dto.auth.RsaKeyProperties;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
@@ -36,8 +37,24 @@ public class SecurityConfig {
 
     private final RsaKeyProperties rsaKeys;
 
+    /**
+     *
+     * Konfiguriert die Sicherheitsfilterkette der Anwendung
+     *
+     * - Aktiviert CORS
+     * - Deaktiviert CSRF
+     * - Definiert öffentlich zugängliche API-Endpunkte
+     * - Erzwingt Authentifizierung für alle anderen Anfragen
+     * - Legt Fehler-Handling fest
+     * - Setzt Session-Policy auf STATELESS
+     *
+     * @param http
+     * @return
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        // TODO: Wenn im AuthToken "reset" true ist alle Anfragen ausser update-password blockieren
         return http
                 .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
@@ -83,8 +100,6 @@ public class SecurityConfig {
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
         return new NimbusJwtEncoder(jwks);
     }
-
-    // TODO: Wenn im AuthToken "reset" true ist alle Anfragen ausser update-password blockieren
 
     @Bean
     public PasswordEncoder passwordEncoder() {

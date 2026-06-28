@@ -3,6 +3,11 @@ package ch.fhnw.fitnesscounter.exception;
 import org.springframework.http.HttpStatus;
 import lombok.Getter;
 
+/**
+ *
+ * Eigene Variation von RuntimeException, um eigene Fehlermeldungen zurückzugeben.
+ *
+ */
 @Getter
 public class FitnessAPIException extends RuntimeException {
     private final HttpStatus status;
