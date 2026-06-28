@@ -6,11 +6,11 @@ import ch.fhnw.fitnesscounter.model.auth.PasswordResetToken;
 import ch.fhnw.fitnesscounter.model.auth.Role;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.repository.PasswordResetTokenRepository;
-import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,7 +27,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenRepository tokenRepository;
     private final MailService mailService;
@@ -36,14 +36,15 @@ public class AuthService {
      *
      * Diese Methode registriert einen neuen Benutzer.
      *
-     * @param registerRequest
      */
     public void register (RegisterRequest registerRequest) {
         log.info("Versuch einer Registrierung für E-Mail: {}", registerRequest.email());
 
         // Prüfe, ob Passwörter übereinstimmen
-        if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword()))
+        if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword())) {
+            log.debug("Eingegeben Passwörter stimmen nicht überein. Betroffene E-Mail: {}", registerRequest.email());
             throw new FitnessAPIException("Passwörter müssen übereinstimmen");
+        }
 
         // Prüfe, ob die E-Mail-Adresse vergeben ist
         if (userService.findByEmail(registerRequest.email()).isPresent()) {
@@ -73,20 +74,29 @@ public class AuthService {
      */
     public LoginResponse login(LoginRequest loginRequest) {
         // Prüfe ob der user existiert
-        User user = userRepository.findByEmail(loginRequest.email()).orElseThrow(
-                () -> new FitnessAPIException("User nicht gefunden"));
+        User user = userService.findByEmailOrThrow(loginRequest.email());
 
         // Melde den Benutzer an
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.email(),
-                        loginRequest.password()
-                )
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequest.email(),
+                            loginRequest.password()
+                    )
+            );
 
-        // Generiere den AuthToken und gebe ihn zurück
-        String token = tokenService.generateToken(authentication, user.isResetPassword());
-        return new LoginResponse(token, user.isResetPassword());
+            // Generiere den AuthToken und gebe ihn zurück
+            String token = tokenService.generateToken(authentication, user.isResetPassword());
+            log.info("User {} hat sich erfolgreich eingeloggt.", loginRequest.email());
+            return new LoginResponse(token, user.isResetPassword());
+        } catch (BadCredentialsException ex) {
+            log.warn("Login-Fehlschlag: Ungültiges Passwort für Konto {}", loginRequest.email());
+            throw ex;
+        }
+        catch (Exception ex) {
+            log.warn("Kritischer Fehler beim Login-Prozess für {}.", loginRequest.email(), ex);
+            throw ex;
+        }
     }
 
     /**
@@ -98,16 +108,18 @@ public class AuthService {
      * @param request
      */
     public void updateInitialPassword (String email, UpdatePasswordRequest request) {
-        if (!Objects.equals(request.newPassword(), request.retypePassword()))
+        if (!Objects.equals(request.newPassword(), request.retypePassword())) {
+            log.debug("Eingegeben Passwörter stimmen nicht überein.");
             throw new FitnessAPIException("Passwörter stimmen nicht überein");
+        }
 
         // Suche den Benutzer in der Datenbank
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("User nicht gefunden"));
+        User user = userService.findByEmailOrThrow(email);
 
         // Setze das neue Passwort
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setResetPassword(false);
-        userRepository.save(user);
+        userService.save(user);
     }
 
     /**
@@ -117,7 +129,7 @@ public class AuthService {
      * @param email
      */
     public void sendResetPasswordEmail (String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("User nicht gefunden"));
+        User user = userService.findByEmailOrThrow(email);
 
         // Lösche allfällige alte Tokens
         tokenRepository.deleteByUser(user);
@@ -127,8 +139,9 @@ public class AuthService {
         String token = UUID.randomUUID().toString();
         PasswordResetToken resetToken = new PasswordResetToken(token, user);
         tokenRepository.save(resetToken);
-
         mailService.sendResetMail(user.getEmail(), token);
+
+        log.info("Reset-Password Token für User {} generiert und verschickt. ", user.getEmail());
     }
 
     /**
@@ -139,15 +152,20 @@ public class AuthService {
      */
     public void resetPassword(ResetPasswordRequest request) {
         // Validiere eingegebenen Passwörter
-        if (!Objects.equals(request.newPassword(), request.retypePassword()))
+        if (!Objects.equals(request.newPassword(), request.retypePassword())) {
+            log.debug("Eingegeben Passwörter stimmen nicht überein. Betroffenes Token: {}", request.token());
             throw new FitnessAPIException("Passwörter stimmen nicht überein", HttpStatus.UNAUTHORIZED);
+        }
 
         // Prüfe den resetToken
-        PasswordResetToken resetToken = tokenRepository.findByToken(request.token()).orElseThrow(()
-                -> new FitnessAPIException("Der Reset-Token ist ungültig.", HttpStatus.UNAUTHORIZED));
+        PasswordResetToken resetToken = tokenRepository.findByToken(request.token()).orElseThrow(() -> {
+            log.warn("Zugriffsversuch gescheitert: Token {} war ungültig. ", request.token());
+            return new FitnessAPIException("Der Reset-Token ist ungültig.", HttpStatus.UNAUTHORIZED);
+        });
 
         if (resetToken.isExpired()) {
             tokenRepository.delete(resetToken);
+            log.warn("Zugriffsversuch gescheitert: Token {} ist abgelaufen. ", request.token());
             throw new FitnessAPIException("Der Reset-Token ist abgelaufen", HttpStatus.UNAUTHORIZED);
         }
 
@@ -155,7 +173,8 @@ public class AuthService {
         User user = resetToken.getUser();
         user.setPassword(passwordEncoder.encode(request.newPassword()));
         user.setResetPassword(false);
-        userRepository.save(user);
+        userService.save(user);
         tokenRepository.delete(resetToken);
+        log.info("Passwort geändert für Benutzer {}. ", user.getEmail());
     }
 }

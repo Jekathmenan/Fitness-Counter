@@ -1,7 +1,5 @@
 package ch.fhnw.fitnesscounter.service;
 
-import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
-import ch.fhnw.fitnesscounter.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
