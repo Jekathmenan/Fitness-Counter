@@ -1,8 +1,8 @@
 package ch.fhnw.fitnesscounter.controller;
 
 import ch.fhnw.fitnesscounter.dto.core.BodyPartDto;
+import ch.fhnw.fitnesscounter.dto.core.BodyPartsListDto;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
-import ch.fhnw.fitnesscounter.dto.core.BodyPartsDTO;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
 import ch.fhnw.fitnesscounter.service.coreData.BodyPartsService;
 import jakarta.validation.Valid;
@@ -45,8 +45,8 @@ public class BodypartController {
 
     @PostMapping("/add-many")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createMultipleBodyParts(@Valid BodyPartsDTO bodyParts, Principal principal) {
-        bodyPartsService.createMany(bodyParts.bodyParts(), principal.getName());
+    public void createMultipleBodyParts(@Valid @RequestBody BodyPartsListDto bodyPartsList, Principal principal) {
+        bodyPartsService.createMany(bodyPartsList.getBodyParts(), principal.getName());
     }
 
     @PutMapping("/{id}")

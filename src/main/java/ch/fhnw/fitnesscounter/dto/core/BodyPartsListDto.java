@@ -1,12 +1,12 @@
 package ch.fhnw.fitnesscounter.dto.core;
 
 import jakarta.validation.Valid;
+import lombok.Getter;
 
 import java.util.List;
 
-public record BodyPartsDTO(
+@Getter
+public class BodyPartsListDto {
         @Valid
-        List<BodyPartDto> bodyParts
-)
-{
+        List<BodyPartDto> bodyParts;
 }
