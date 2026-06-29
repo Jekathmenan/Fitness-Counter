@@ -68,7 +68,7 @@ public class SecurityConfig {
                         .authenticationEntryPoint(((request, response, authException) -> {
                             response.setContentType("application/json");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{ \\\"error\\\": \\\"Ungültiger oder abgelaufener Token.\\\" }");
+                            response.getWriter().write("{ \"error\": \"Ungültiger oder abgelaufener Token.\" }");
                         }))
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
