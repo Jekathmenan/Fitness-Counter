@@ -20,13 +20,35 @@ import java.util.List;
 public class BodyPartService {
     private final BodyPartsRepository bodyPartsRepository;
 
+    /**
+     *
+     * Diese Methode liest alle erfassten BodyParts aus und gibt sie zurück als DTOs
+     *
+     * @return
+     */
     public List<BodyPartDto> getAllBodyParts () {
-        List<BodyPartDto> bodyParts = new ArrayList<>();
-        bodyPartsRepository.findAll().forEach(bp -> {
-            BodyPartDto dto = new BodyPartDto(bp.getId(), bp.getName(), bp.getDescription());
-            bodyParts.add(dto);
-        });
-        return bodyParts;
+        return bodyPartsRepository.findAll().stream()
+                // mappe die gefundenen BodyParts zu BodyPartDtos
+                .map(bp -> new BodyPartDto(
+                        bp.getId(),
+                        bp.getName(),
+                        bp.getDescription()
+                )).toList();
+    }
+
+    /**
+     *
+     * Diese Methode gibt, wenn gefunden, die BodyPart als DTO zurück.
+     *
+     * @param id
+     * @param user
+     * @return
+     */
+    public BodyPartDto getBodyPartById (Long id, String user) {
+        return bodyPartsRepository.findById(id).orElseThrow(() -> {
+            log.warn("User {} tried to read a BodyPart that does not exist {}.", user, id);
+            return new FitnessAPIException("BodyPart does not exist", HttpStatus.NOT_FOUND);
+        }).toDto();
     }
 
     /**
