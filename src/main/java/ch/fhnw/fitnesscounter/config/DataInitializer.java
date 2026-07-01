@@ -39,10 +39,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // Erstelle den Admin-Benutzer, wenn dieser nicht schon existiert
-        seedUsers();
+        seedAdminUser();
         seedDefaultBodyParts();
     }
 
+    private void seedAdminUser() {
         if (userRepository.findByEmail("admin@fitness.ch").isEmpty()) {
             User admin = User.builder()
                     .email("admin@fitness.ch")
