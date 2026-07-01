@@ -1,6 +1,6 @@
 package ch.fhnw.fitnesscounter.model.coreData;
 
-import ch.fhnw.fitnesscounter.dto.core.BodyPartDto;
+import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.model.BaseEntity;
 import ch.fhnw.fitnesscounter.util.DataNormalizer;
 import jakarta.persistence.*;

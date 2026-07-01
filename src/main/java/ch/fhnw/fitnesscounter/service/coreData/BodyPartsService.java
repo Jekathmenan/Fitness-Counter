@@ -1,6 +1,6 @@
 package ch.fhnw.fitnesscounter.service.coreData;
 
-import ch.fhnw.fitnesscounter.dto.core.BodyPartDto;
+import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;

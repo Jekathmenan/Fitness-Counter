@@ -1,4 +1,4 @@
-package ch.fhnw.fitnesscounter.dto.core;
+package ch.fhnw.fitnesscounter.dto.coreData;
 
 import jakarta.validation.Valid;
 import lombok.Getter;

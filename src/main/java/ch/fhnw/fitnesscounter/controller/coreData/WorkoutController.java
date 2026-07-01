@@ -1,4 +1,4 @@
-package ch.fhnw.fitnesscounter.controller;
+package ch.fhnw.fitnesscounter.controller.coreData;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;

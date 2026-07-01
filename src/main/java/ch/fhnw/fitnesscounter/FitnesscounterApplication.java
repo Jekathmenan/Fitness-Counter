@@ -1,7 +1,7 @@
 package ch.fhnw.fitnesscounter;
 
 import ch.fhnw.fitnesscounter.dto.auth.RsaKeyProperties;
-import ch.fhnw.fitnesscounter.controller.BodypartController;
+import ch.fhnw.fitnesscounter.controller.coreData.BodypartController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
