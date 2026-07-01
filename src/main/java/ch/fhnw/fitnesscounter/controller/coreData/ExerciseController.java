@@ -25,6 +25,6 @@ public class ExerciseController {
     @PostMapping("/add-many")
     @ResponseStatus(HttpStatus.CREATED)
     public void createMultipleExercises(@Valid @RequestBody ExercisesListDto exerciseList, Principal principal) {
-
+        exerciseService.createMultipleExercises(exerciseList, principal.getName());
     }
 }
