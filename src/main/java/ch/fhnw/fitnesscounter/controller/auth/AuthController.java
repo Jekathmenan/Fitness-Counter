@@ -1,4 +1,4 @@
-package ch.fhnw.fitnesscounter.controller;
+package ch.fhnw.fitnesscounter.controller.auth;
 
 import ch.fhnw.fitnesscounter.dto.auth.*;
 import ch.fhnw.fitnesscounter.service.AuthService;
