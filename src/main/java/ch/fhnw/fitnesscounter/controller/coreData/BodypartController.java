@@ -4,7 +4,7 @@ import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartsListDto;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
-import ch.fhnw.fitnesscounter.service.coreData.BodyPartsService;
+import ch.fhnw.fitnesscounter.service.coreData.BodyPartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BodypartController {
     private final BodyPartsRepository bodyPartsRepository;
-    private final BodyPartsService bodyPartsService;
+    private final BodyPartService bodyPartService;
 
     /**
      *
@@ -40,24 +40,24 @@ public class BodypartController {
     @PostMapping("/")
     @ResponseStatus(HttpStatus.CREATED)
     public void createBodyPart(@Valid @RequestBody BodyPartDto bodyPart, Principal principal) {
-        bodyPartsService.createBodyPart(bodyPart, principal.getName());
+        bodyPartService.createBodyPart(bodyPart, principal.getName());
     }
 
     @PostMapping("/add-many")
     @ResponseStatus(HttpStatus.CREATED)
     public void createMultipleBodyParts(@Valid @RequestBody BodyPartsListDto bodyPartsList, Principal principal) {
-        bodyPartsService.createMany(bodyPartsList.getBodyParts(), principal.getName());
+        bodyPartService.createMany(bodyPartsList.getBodyParts(), principal.getName());
     }
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateBodyPart(@PathVariable Long id, @Valid @RequestBody BodyPartDto bodyPartDto, Principal principal) {
-        bodyPartsService.updateBodyPart(id, bodyPartDto, principal.getName());
+        bodyPartService.updateBodyPart(id, bodyPartDto, principal.getName());
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteBodyPart(@PathVariable Long id, Principal principal) {
-        bodyPartsService.deleteBodyPart(id, principal.getName());
+        bodyPartService.deleteBodyPart(id, principal.getName());
     }
 }

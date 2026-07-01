@@ -5,7 +5,7 @@ import ch.fhnw.fitnesscounter.model.auth.Role;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
-import ch.fhnw.fitnesscounter.service.coreData.BodyPartsService;
+import ch.fhnw.fitnesscounter.service.coreData.BodyPartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.asm.TypeReference;
 import org.springframework.boot.CommandLineRunner;
@@ -27,7 +27,7 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final BodyPartsRepository bodyPartsRepository;
-    private final BodyPartsService bodyPartsService;
+    private final BodyPartService bodyPartService;
     private final ObjectMapper objectMapper;
 
     /**
@@ -69,7 +69,7 @@ public class DataInitializer implements CommandLineRunner {
                 BodyPartsListDto bodyPartsListDto = objectMapper.readValue(inputStream, BodyPartsListDto.class);
 
                 // Übergebe bodyPartList an den Service
-                bodyPartsService.createMany(bodyPartsListDto.getBodyParts(), "admin@fitness.ch");
+                bodyPartService.createMany(bodyPartsListDto.getBodyParts(), "admin@fitness.ch");
             } catch (Exception e) {
                 throw new RuntimeException("Fehler beim Füllen der Datenbank mit Initialdaten.", e);
             }

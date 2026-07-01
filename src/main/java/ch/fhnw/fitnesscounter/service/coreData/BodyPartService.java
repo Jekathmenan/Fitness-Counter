@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class BodyPartsService {
+public class BodyPartService {
     private final BodyPartsRepository bodyPartsRepository;
 
     /**
@@ -47,10 +47,7 @@ public class BodyPartsService {
      * @param user
      */
     public void createMany (List<BodyPartDto> dtos, String user) {
-        for(BodyPartDto dto : dtos) {
-            createBodyPart(dto, user);
-        }
-        // dtos.forEach(dto -> createBodyPart(dto, user));
+        dtos.forEach(dto -> createBodyPart(dto, user));
     }
 
     /**
