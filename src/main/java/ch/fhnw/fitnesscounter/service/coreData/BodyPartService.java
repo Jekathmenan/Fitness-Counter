@@ -20,6 +20,15 @@ import java.util.List;
 public class BodyPartService {
     private final BodyPartsRepository bodyPartsRepository;
 
+    public List<BodyPartDto> getAllBodyParts () {
+        List<BodyPartDto> bodyParts = new ArrayList<>();
+        bodyPartsRepository.findAll().forEach(bp -> {
+            BodyPartDto dto = new BodyPartDto(bp.getId(), bp.getName(), bp.getDescription());
+            bodyParts.add(dto);
+        });
+        return bodyParts;
+    }
+
     /**
      *
      * Adds a given Body part/Muscle to db, if it does not exist. For now any User can create his Body Parts
