@@ -1,6 +1,7 @@
 package ch.fhnw.fitnesscounter.service.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
+import ch.fhnw.fitnesscounter.dto.coreData.ExerciseGetDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
@@ -22,6 +23,37 @@ import java.util.List;
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final BodyPartsRepository bodyPartsRepository;
+
+    /**
+     *
+     * Diese Methode gibt alle Exercises zurück.
+     *
+     * @return
+     */
+    public List<ExerciseGetDto> getAllExercises () {
+        return exerciseRepository.findAll().stream()
+                .map(ex -> new ExerciseGetDto(
+                        ex.getName(),
+                        ex.getDescription(),
+                        ex.getTrainedBodyPartsAsDto()
+                ))
+                .toList();
+    }
+
+    /**
+     *
+     * Diese Methode gibt, wenn gefunden, die Exercise als DTO zurück.
+     *
+     * @param id
+     * @param user
+     * @return
+     */
+    public ExerciseGetDto getExerciseById (Long id, String user) {
+        return exerciseRepository.findById(id).orElseThrow(() -> {
+            log.warn("User {} tried to get a Exercise that does not exist: {}.", user, id);
+            return new FitnessAPIException("Exercise does not exist", HttpStatus.NOT_FOUND);
+        }).toDto();
+    }
 
     /**
      *
@@ -52,7 +84,7 @@ public class ExerciseService {
 
     /**
      *
-     * Diese Methode erstellt
+     * Diese Methode erstellt mehrere angegebene Übungen → Ruft createExercise auf.
      *
      * @param exercisesList
      * @param user
