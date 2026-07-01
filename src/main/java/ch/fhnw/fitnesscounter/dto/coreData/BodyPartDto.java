@@ -1,5 +1,6 @@
 package ch.fhnw.fitnesscounter.dto.coreData;
 
+import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import jakarta.validation.constraints.*;
 
 public record BodyPartDto(
@@ -12,4 +13,9 @@ public record BodyPartDto(
         String name,
         String description
 ) {
+        public static BodyPartDto fromEntity(BodyPart bodyPart) {
+                if (bodyPart == null) return null;
+                return new BodyPartDto(bodyPart.getId(), bodyPart.getName(), bodyPart.getDescription());
+
+        }
 }
