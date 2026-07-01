@@ -1,7 +1,7 @@
 package ch.fhnw.fitnesscounter.controller.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
-import ch.fhnw.fitnesscounter.model.coreData.Exercise;
+import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.service.coreData.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,5 +20,11 @@ public class ExerciseController {
     @ResponseStatus(HttpStatus.CREATED)
     public void createExercise (@Valid @RequestBody ExerciseDto exerciseDto, Principal principal) {
         exerciseService.createExercise(exerciseDto, principal.getName());
+    }
+
+    @PostMapping("/add-many")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createMultipleExercises(@Valid @RequestBody ExercisesListDto exerciseList, Principal principal) {
+
     }
 }

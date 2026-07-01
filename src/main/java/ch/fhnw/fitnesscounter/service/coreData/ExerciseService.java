@@ -1,6 +1,7 @@
 package ch.fhnw.fitnesscounter.service.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
+import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
@@ -47,5 +48,16 @@ public class ExerciseService {
         // Weise BodyParts dem exercise zu und speichere es
         exercise.setTrainedBodyParts(new HashSet<>(bodyParts));
         exerciseRepository.save(exercise);
+    }
+
+    /**
+     *
+     * Diese Methode erstellt
+     *
+     * @param exercisesList
+     * @param user
+     */
+    public void createMultipleExercises (ExercisesListDto exercisesList, String user) {
+        exercisesList.getExercises().forEach(e -> createExercise(e, user));
     }
 }
