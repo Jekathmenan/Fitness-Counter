@@ -5,6 +5,8 @@ import ch.fhnw.fitnesscounter.model.BaseEntity;
 import ch.fhnw.fitnesscounter.util.DataNormalizer;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name= "bodyparts")
@@ -23,6 +25,9 @@ public class BodyPart extends BaseEntity  {
 
     @Column(nullable = true)
     private String description;
+
+    @ManyToMany(mappedBy = "trainedBodyParts")
+    private Set<Exercise> exercises = new HashSet<>();
 
     /**
      *
