@@ -27,8 +27,8 @@ public class BodypartController {
      * @return
      */
     @GetMapping("/")
-    public List<BodyPart> getBodyParts () {
-        return bodyPartsRepository.findAll();
+    public List<BodyPartDto> getBodyParts () {
+        return bodyPartService.getAllBodyParts();
     }
 
     /**
