@@ -40,5 +40,9 @@ public class BodyPart extends BaseEntity  {
         this.description = dto.description();
     }
 
+    public BodyPartDto toDto() {
+        return new BodyPartDto(id, name, description);
+    }
+
     // TODO: User should be able to request a Body Part. A requested bodypart is available for that user once a admin grants that request that bodypart is available for all users
 }

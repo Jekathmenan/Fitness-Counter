@@ -1,9 +1,12 @@
 package ch.fhnw.fitnesscounter.model.coreData;
 
+import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
+import ch.fhnw.fitnesscounter.dto.coreData.ExerciseGetDto;
 import ch.fhnw.fitnesscounter.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -30,4 +33,12 @@ public class Exercise extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "body_part_id")
     )
     private Set<BodyPart> trainedBodyParts = new HashSet<>();
+
+    public List<BodyPartDto> getTrainedBodyPartsAsDto () {
+        return trainedBodyParts.stream().map(BodyPartDto::fromEntity).toList();
+    }
+
+    public ExerciseGetDto toDto() {
+        return new ExerciseGetDto(name, description, getTrainedBodyPartsAsDto());
+    }
 }
