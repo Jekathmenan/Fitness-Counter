@@ -2,8 +2,6 @@ package ch.fhnw.fitnesscounter.controller.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartsListDto;
-import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
-import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
 import ch.fhnw.fitnesscounter.service.coreData.BodyPartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/body-part")
 @RequiredArgsConstructor
-public class BodypartController {
-    private final BodyPartsRepository bodyPartsRepository;
+public class BodyPartController {
     private final BodyPartService bodyPartService;
 
     /**
@@ -33,6 +30,19 @@ public class BodypartController {
 
     /**
      *
+     * Diese Route erlaubt das Auslesen eines einzelnen Körperteils
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public List<BodyPartDto> getBodyPartById (@PathVariable Long id) {
+        return bodyPartService.getAllBodyParts();
+        // return bodyPartsRepository.findAll();
+    }
+
+    /**
+     *
      * Erlaubt die Erfassung von neuen Körperteilen/Muskeln.
      *
      * @param bodyPart
@@ -43,18 +53,40 @@ public class BodypartController {
         bodyPartService.createBodyPart(bodyPart, principal.getName());
     }
 
+    /**
+     *
+     * Mit dieser Route lassen sich mehrere Körperteile gleichzeitig erfassen.
+     *
+     * @param bodyPartsList
+     * @param principal
+     */
     @PostMapping("/add-many")
     @ResponseStatus(HttpStatus.CREATED)
     public void createMultipleBodyParts(@Valid @RequestBody BodyPartsListDto bodyPartsList, Principal principal) {
         bodyPartService.createMany(bodyPartsList.getBodyParts(), principal.getName());
     }
 
+    /**
+     *
+     * Mit dieser Methode kann ein Körperteil geändert werden.
+     *
+     * @param id
+     * @param bodyPartDto
+     * @param principal
+     */
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateBodyPart(@PathVariable Long id, @Valid @RequestBody BodyPartDto bodyPartDto, Principal principal) {
         bodyPartService.updateBodyPart(id, bodyPartDto, principal.getName());
     }
 
+    /**
+     *
+     * Diese Route erlaubt das Löschen eines Körperteils.
+     *
+     * @param id
+     * @param principal
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteBodyPart(@PathVariable Long id, Principal principal) {

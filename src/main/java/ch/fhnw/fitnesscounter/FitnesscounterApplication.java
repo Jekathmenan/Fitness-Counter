@@ -13,7 +13,6 @@ import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoCon
 @EnableConfigurationProperties(RsaKeyProperties.class)
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class, UserDetailsServiceAutoConfiguration.class})
 public class FitnesscounterApplication {
-	private static final Logger log = LoggerFactory.getLogger(BodypartController.class);
 	public static void main(String[] args) {
 		SpringApplication.run(FitnesscounterApplication.class, args);
 	}
