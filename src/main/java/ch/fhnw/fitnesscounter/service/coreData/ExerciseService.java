@@ -98,6 +98,27 @@ public class ExerciseService {
 
     /**
      *
+     * Diese Methode aktualisiert eine bestehende Übung mit neuen Daten.
+     *
+     * @param id
+     * @param exerciseDto
+     * @param user
+     */
+    public  void updateExercise (Long id, ExerciseDto exerciseDto, String user) {
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(() -> {
+            log.warn("User {} tried to update a non existing Exercise {}", user, id);
+            return new FitnessAPIException("Exercise by id " + id + " does not exist.", HttpStatus.NOT_FOUND);
+        });
+
+        Set<BodyPart> bodyParts = exerciseDto.bodyParts().stream().map(this::findOrCreateBodyPart).collect(Collectors.toSet());
+        exercise.setName(exerciseDto.name());
+        exercise.setDescription(exerciseDto.description());
+        exercise.setTrainedBodyParts(bodyParts);
+        exerciseRepository.save(exercise);
+    }
+
+    /**
+     *
      * Diese Methode löscht eine Übung.
      *
      * @param id

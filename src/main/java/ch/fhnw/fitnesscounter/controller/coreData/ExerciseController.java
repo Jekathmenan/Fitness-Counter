@@ -62,6 +62,27 @@ public class ExerciseController {
         exerciseService.createMultipleExercises(exerciseList, principal.getName());
     }
 
+    /**
+     *
+     * Diese Route erlaubt das Ändern einer bestehenden Übung.
+     *
+     * @param id
+     * @param exerciseDto
+     * @param principal
+     */
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void updateExercise(@PathVariable Long id, @Valid @RequestBody ExerciseDto exerciseDto, Principal principal) {
+        exerciseService.updateExercise(id, exerciseDto, principal.getName());
+    }
+
+    /**
+     *
+     * Diese Route erlaubt das Löschen einer Übung.
+     *
+     * @param id
+     * @param principal
+     */
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteExercise (@PathVariable Long id, Principal principal) {
