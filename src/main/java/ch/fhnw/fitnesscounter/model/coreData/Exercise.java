@@ -38,7 +38,7 @@ public class Exercise extends BaseEntity {
         return trainedBodyParts.stream().map(BodyPartDto::fromEntity).toList();
     }
 
-    public ExerciseGetDto toDto() {
-        return new ExerciseGetDto(name, description, getTrainedBodyPartsAsDto());
+    public ExerciseDto toDto() {
+        return new ExerciseDto(id, name, description, getTrainedBodyPartsAsDto());
     }
 }

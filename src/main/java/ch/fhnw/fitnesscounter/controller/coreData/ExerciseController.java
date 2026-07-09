@@ -26,7 +26,7 @@ public class ExerciseController {
      */
     @GetMapping("/")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public List<ExerciseGetDto> getExercises (Principal principal) {
+    public List<ExerciseDto> getExercises (Principal principal) {
         return exerciseService.getAllExercises();
     }
 
@@ -40,7 +40,7 @@ public class ExerciseController {
      */
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ExerciseGetDto getExerciseById (@PathVariable Long id, Principal principal) {
+    public ExerciseDto getExerciseById (@PathVariable Long id, Principal principal) {
         return exerciseService.getExerciseById(id, principal.getName());
     }
 

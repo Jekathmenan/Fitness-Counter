@@ -1,5 +1,6 @@
 package ch.fhnw.fitnesscounter.service.coreData;
 
+import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
@@ -32,9 +33,10 @@ public class ExerciseService {
      *
      * @return
      */
-    public List<ExerciseGetDto> getAllExercises () {
+    public List<ExerciseDto> getAllExercises () {
         return exerciseRepository.findAll().stream()
-                .map(ex -> new ExerciseGetDto(
+                .map(ex -> new ExerciseDto(
+                        ex.getId(),
                         ex.getName(),
                         ex.getDescription(),
                         ex.getTrainedBodyPartsAsDto()
@@ -50,7 +52,7 @@ public class ExerciseService {
      * @param user
      * @return
      */
-    public ExerciseGetDto getExerciseById (Long id, String user) {
+    public ExerciseDto getExerciseById (Long id, String user) {
         return exerciseRepository.findById(id).orElseThrow(() -> {
             log.warn("User {} tried to get a Exercise that does not exist: {}.", user, id);
             return new FitnessAPIException("Exercise does not exist", HttpStatus.NOT_FOUND);

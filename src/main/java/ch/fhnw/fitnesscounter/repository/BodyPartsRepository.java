@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BodyPartsRepository extends JpaRepository<BodyPart, Long> {
     boolean existsByNameIgnoreCase(String name);
+    Optional<BodyPart> findByNameIgnoreCase(String name);
 }
