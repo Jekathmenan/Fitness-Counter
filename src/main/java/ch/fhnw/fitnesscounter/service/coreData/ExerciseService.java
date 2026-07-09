@@ -3,11 +3,14 @@ package ch.fhnw.fitnesscounter.service.coreData;
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
+import ch.fhnw.fitnesscounter.dto.coreData.MovementTypeDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
+import ch.fhnw.fitnesscounter.model.coreData.MovementType;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
 import ch.fhnw.fitnesscounter.repository.ExerciseRepository;
+import ch.fhnw.fitnesscounter.repository.MovementTypeRepository;
 import ch.fhnw.fitnesscounter.util.DataNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
 public class ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final BodyPartsRepository bodyPartsRepository;
+    private final MovementTypeRepository movementTypeRepository;
 
     /**
      *
@@ -39,7 +43,8 @@ public class ExerciseService {
                         ex.getId(),
                         ex.getName(),
                         ex.getDescription(),
-                        ex.getTrainedBodyPartsAsDto()
+                        ex.getTrainedBodyPartsAsDto(),
+                        ex.getMovementTypesAsDto()
                 ))
                 .toList();
     }
@@ -82,6 +87,11 @@ public class ExerciseService {
 
         // Weise BodyParts dem exercise zu und speichere es
         exercise.setTrainedBodyParts(new HashSet<>(bodyParts));
+
+        // Lese alle Bewegungstypen aus oder erstelle sie und weise sie der Übung zu.
+        Set<MovementType> movementTypes = dto.movements().stream().map(this::findOrCreateMovementType).collect(Collectors.toSet());
+        exercise.setMovementTypes(movementTypes);
+
         exerciseRepository.save(exercise);
     }
 
@@ -111,9 +121,12 @@ public class ExerciseService {
         });
 
         Set<BodyPart> bodyParts = exerciseDto.bodyParts().stream().map(this::findOrCreateBodyPart).collect(Collectors.toSet());
+        Set<MovementType> movementTypes = exerciseDto.movements().stream().map(this::findOrCreateMovementType).collect(Collectors.toSet());
+
         exercise.setName(exerciseDto.name());
         exercise.setDescription(exerciseDto.description());
         exercise.setTrainedBodyParts(bodyParts);
+        exercise.setMovementTypes(movementTypes);
         exerciseRepository.save(exercise);
     }
 
@@ -149,5 +162,16 @@ public class ExerciseService {
                     newBp.setDescription(bpDto.description());
                     return bodyPartsRepository.save(newBp);
                 });
+    }
+
+    private MovementType findOrCreateMovementType (MovementTypeDto dto) {
+        return movementTypeRepository.findByNameIgnoreCase(dto.name())
+                .orElseGet(() -> {
+                    MovementType movementType = new MovementType();
+                    movementType.setName(dto.name());
+                    movementType.setDescription(dto.description());
+                    return movementTypeRepository.save(movementType);
+                }
+        );
     }
 }

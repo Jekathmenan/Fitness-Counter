@@ -1,10 +1,11 @@
 package ch.fhnw.fitnesscounter.dto.coreData;
 
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.*;
 
 public record BodyPartDto(
-        @Null
+        @Nullable
         Long id,
         @NotBlank(message = "Name darf nicht leer sein.")
         @NotNull
