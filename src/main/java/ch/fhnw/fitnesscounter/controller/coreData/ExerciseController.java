@@ -62,4 +62,10 @@ public class ExerciseController {
     public void createMultipleExercises(@Valid @RequestBody ExercisesListDto exerciseList, Principal principal) {
         exerciseService.createMultipleExercises(exerciseList, principal.getName());
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void deleteExercise (@PathVariable Long id, Principal principal) {
+        exerciseService.deleteExercise(id, principal.getName());
+    }
 }

@@ -95,6 +95,24 @@ public class ExerciseService {
     public void createMultipleExercises (ExercisesListDto exercisesList, String user) {
         exercisesList.getExercises().forEach(e -> createExercise(e, user));
     }
+
+    /**
+     *
+     * Diese Methode löscht eine Übung.
+     *
+     * @param id
+     * @param user
+     */
+    public void deleteExercise (Long id, String user) {
+        if (!exerciseRepository.existsById(id)){
+            log.warn("User {} tried to delete a non existing Exercise {}", user, id);
+            return;
+        }
+
+        exerciseRepository.deleteById(id);
+        log.info("User {} successfully deleted exercise {}", user, id);
+    }
+
     /**
      *
      * Diese Hilfsmethode findet den BodyPart nach dem Namen. Falls nicht gefunden wird die BodyPart neu erstellt.

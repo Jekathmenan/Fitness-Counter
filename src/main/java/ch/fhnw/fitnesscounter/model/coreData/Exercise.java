@@ -1,7 +1,7 @@
 package ch.fhnw.fitnesscounter.model.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
-import ch.fhnw.fitnesscounter.dto.coreData.ExerciseGetDto;
+import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
