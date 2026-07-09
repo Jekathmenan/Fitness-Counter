@@ -1,7 +1,6 @@
 package ch.fhnw.fitnesscounter.controller.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
-import ch.fhnw.fitnesscounter.dto.coreData.ExerciseGetDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.service.coreData.ExerciseService;
 import jakarta.validation.Valid;
