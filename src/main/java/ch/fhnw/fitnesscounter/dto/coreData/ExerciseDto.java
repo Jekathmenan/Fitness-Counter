@@ -11,6 +11,10 @@ public record ExerciseDto(
         String description,
 
         @JsonProperty("bodyParts")
-        List<BodyPartDto> bodyParts
+        List<BodyPartDto> bodyParts,
+
+        @Nullable
+        @JsonProperty("movements")
+        List<MovementTypeDto> movements
 ) {
 }

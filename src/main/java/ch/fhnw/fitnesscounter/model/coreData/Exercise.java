@@ -2,6 +2,7 @@ package ch.fhnw.fitnesscounter.model.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.BodyPartDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
+import ch.fhnw.fitnesscounter.dto.coreData.MovementTypeDto;
 import ch.fhnw.fitnesscounter.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,11 +35,24 @@ public class Exercise extends BaseEntity {
     )
     private Set<BodyPart> trainedBodyParts = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable (
+            name = "exercise_movement_type",
+            joinColumns = @JoinColumn(name = "exercise_id"),
+            inverseJoinColumns = @JoinColumn(name = "movement_type_id")
+    )
+    private Set<MovementType> movementTypes = new HashSet<>();
+
+
     public List<BodyPartDto> getTrainedBodyPartsAsDto () {
         return trainedBodyParts.stream().map(BodyPartDto::fromEntity).toList();
     }
 
+    public List<MovementTypeDto> getMovementTypesAsDto () {
+        return movementTypes.stream().map(MovementTypeDto::fromEntity).toList();
+    }
+
     public ExerciseDto toDto() {
-        return new ExerciseDto(id, name, description, getTrainedBodyPartsAsDto());
+        return new ExerciseDto(id, name, description, getTrainedBodyPartsAsDto(), getMovementTypesAsDto());
     }
 }
