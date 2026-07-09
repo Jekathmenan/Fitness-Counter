@@ -1,13 +1,13 @@
 package ch.fhnw.fitnesscounter.service.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
-import ch.fhnw.fitnesscounter.dto.coreData.ExerciseGetDto;
 import ch.fhnw.fitnesscounter.dto.coreData.ExercisesListDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
 import ch.fhnw.fitnesscounter.repository.BodyPartsRepository;
 import ch.fhnw.fitnesscounter.repository.ExerciseRepository;
+import ch.fhnw.fitnesscounter.util.DataNormalizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -63,19 +65,18 @@ public class ExerciseService {
      * @param email
      */
     public void createExercise (ExerciseDto dto, String email) {
+        if (exerciseRepository.existsByName(dto.name()))
+            return;
+
         // Erstelle ein neues Exercise Objekt
         Exercise exercise = Exercise.builder()
                 .name(dto.name())
                 .description(dto.description())
                 .build();
 
-        // Lese die Ids aller mitgegebenen BodyParts
-        List<BodyPart> bodyParts = bodyPartsRepository.findAllById(dto.bodyPartIds());
-
-        if (bodyParts.size() != dto.bodyPartIds().size()) {
-            log.info("Einige der angegebenen BodyParts für das Erstellen der Exercise {} wurden nicht gefunden. Exercise nicht angelegt.", exercise.getName());
-            throw new FitnessAPIException("Einige der BodyParts nicht gefunden. Exercise nicht angelegt.", HttpStatus.NOT_FOUND);
-        }
+        // Lese alle BodyParts aus
+        Set<BodyPart> bodyParts = dto.bodyParts().stream().map(this::findOrCreateBodyPart) // Verhindere Doppelte BodyParts mit Set
+                .collect(Collectors.toSet());
 
         // Weise BodyParts dem exercise zu und speichere es
         exercise.setTrainedBodyParts(new HashSet<>(bodyParts));
@@ -91,5 +92,21 @@ public class ExerciseService {
      */
     public void createMultipleExercises (ExercisesListDto exercisesList, String user) {
         exercisesList.getExercises().forEach(e -> createExercise(e, user));
+    }
+    /**
+     *
+     * Diese Hilfsmethode findet den BodyPart nach dem Namen. Falls nicht gefunden wird die BodyPart neu erstellt.
+     *
+     * @param bpDto
+     * @return
+     */
+    private BodyPart findOrCreateBodyPart(BodyPartDto bpDto) {
+        return bodyPartsRepository.findByNameIgnoreCase(DataNormalizer.normalizeString(bpDto.name()))
+                .orElseGet(() -> {
+                    BodyPart newBp = new BodyPart();
+                    newBp.setName(DataNormalizer.normalizeString(bpDto.name()));
+                    newBp.setDescription(bpDto.description());
+                    return bodyPartsRepository.save(newBp);
+                });
     }
 }
