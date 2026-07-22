@@ -1,7 +1,7 @@
 package ch.fhnw.fitnesscounter.controller.auth;
 
 import ch.fhnw.fitnesscounter.dto.auth.*;
-import ch.fhnw.fitnesscounter.service.AuthService;
+import ch.fhnw.fitnesscounter.service.auth.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
