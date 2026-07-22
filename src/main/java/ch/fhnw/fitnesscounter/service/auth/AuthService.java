@@ -1,4 +1,4 @@
-package ch.fhnw.fitnesscounter.service;
+package ch.fhnw.fitnesscounter.service.auth;
 
 import ch.fhnw.fitnesscounter.dto.auth.*;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
