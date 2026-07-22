@@ -1,15 +1,13 @@
 package ch.fhnw.fitnesscounter.model.coreData;
 
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciceDto;
+import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutSetDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "workout_exercise")
@@ -37,8 +35,8 @@ public class WorkoutExercise {
         set.setWorkoutExercise(this);
     }
 
-    public WorkoutExerciceDto toDto () {
+    public WorkoutExerciseDto toDto () {
         List<WorkoutSetDto> workoutSetDtos = sets.stream().map(WorkoutSet::toDto).toList();
-        return new WorkoutExerciceDto(id, workoutSetDtos, exercise);
+        return new WorkoutExerciseDto(id, workoutSetDtos, exercise);
     }
 }

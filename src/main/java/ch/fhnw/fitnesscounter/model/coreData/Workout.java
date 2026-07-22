@@ -2,7 +2,7 @@ package ch.fhnw.fitnesscounter.model.coreData;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciceDto;
+import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,7 +43,7 @@ public class Workout {
     public WorkoutDto toDTO()
     {
         List<ExerciseDto> exerciseDtos = exercises.stream().map(exercise -> exercise.getExercise().toDto()).toList();
-        List<WorkoutExerciceDto> workoutExercises = exercises.stream().map(WorkoutExercise::toDto).toList();
+        List<WorkoutExerciseDto> workoutExercises = exercises.stream().map(WorkoutExercise::toDto).toList();
 
         return new WorkoutDto(id, name, user, startTime, endTime, workoutExercises);
     }
