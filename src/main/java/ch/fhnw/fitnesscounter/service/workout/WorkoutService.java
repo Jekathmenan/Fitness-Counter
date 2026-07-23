@@ -115,4 +115,27 @@ public class WorkoutService {
         workoutRepository.save(w);
     }
 
+    public WorkoutDto addExercise (Long id, ExerciseDto exerciseDto, String email) {
+        // Suche das passende Workout
+        Workout workout = workoutRepository.findByIdAndEndTimeIsNull(id).orElseThrow(() -> new FitnessAPIException("", HttpStatus.NOT_FOUND));
+
+        // Prüfe, ob das Workout tatsächlich dem eingeloggten Benutzer gehört
+        if (!workout.getUser().getEmail().equals(email))
+            throw new FitnessAPIException("Keine Berechtigung für dieses Training", HttpStatus.FORBIDDEN);
+
+        //
+        if (exerciseDto.name() == null || exerciseDto.name().isBlank())
+            throw new FitnessAPIException("Übungsname darf nicht leer sein.", HttpStatus.BAD_REQUEST);
+
+        Exercise exercise = exerciseRepository.findByName(exerciseDto.name()).
+                orElseThrow(() -> new FitnessAPIException("Übung existiert nicht.", HttpStatus.EXPECTATION_FAILED));
+
+        WorkoutExercise workoutExercise = new WorkoutExercise();
+        workoutExercise.setExercise(exercise);
+
+        workoutExerciseRepository.save(workoutExercise);
+        workout.addExercise(workoutExercise);
+        workoutRepository.save(workout);
+        return workout.toDTO();
+    }
 }

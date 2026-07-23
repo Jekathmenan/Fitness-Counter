@@ -20,6 +20,6 @@ public record WorkoutDto(
         @Nullable
         LocalDateTime endTime,
         @Nullable
-        List<WorkoutExerciseDto> wokoutExercises
+        List<WorkoutExerciseDto> workoutExercises
 ) {
 }
