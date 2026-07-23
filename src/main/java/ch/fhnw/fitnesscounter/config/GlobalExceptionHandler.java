@@ -1,5 +1,6 @@
 package ch.fhnw.fitnesscounter.config;
 
+import ch.fhnw.fitnesscounter.dto.error.ErrorDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -95,9 +98,9 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(FitnessAPIException.class)
-    public ResponseEntity<Map<String, String>> handleRuntime(FitnessAPIException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getMessage());
-        return ResponseEntity.status(ex.getStatus()).body(error);
+    public ResponseEntity<ErrorDto> handleRuntime(FitnessAPIException ex) {
+        ErrorDto errorResponse = new ErrorDto(ex.getMessage(), LocalDateTime.now(), ex.getData());
+
+        return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
 }

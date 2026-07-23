@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public record ExerciseDto(
+        @Nullable
         Long id,
         @NotBlank(message = "Name darf nicht leer sein")
         String name,

@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 public class FitnessAPIException extends RuntimeException {
     private final HttpStatus status;
+    private Object data;
 
     public FitnessAPIException (String message) {
         this(message, HttpStatus.BAD_REQUEST);
@@ -19,5 +20,11 @@ public class FitnessAPIException extends RuntimeException {
     public FitnessAPIException(String message, HttpStatus status) {
         super(message);
         this.status = status;
+    }
+
+    public FitnessAPIException(String message, HttpStatus status, Object data) {
+        super(message);
+        this.status = status;
+        this.data = data;
     }
 }
