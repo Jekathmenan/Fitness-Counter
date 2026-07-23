@@ -5,6 +5,7 @@ import ch.fhnw.fitnesscounter.dto.workout.WorkoutSetDto;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @Table(name = "workout_exercise")
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class WorkoutExercise {
     @Id
@@ -28,7 +30,7 @@ public class WorkoutExercise {
     private Exercise exercise;
 
     @OneToMany(mappedBy = "workoutExercise", cascade = CascadeType.ALL, orphanRemoval = true)
-    private static List<WorkoutSet> sets = new ArrayList<>();
+    private List<WorkoutSet> sets = new ArrayList<>();
 
     public void addSet(WorkoutSet set) {
         sets.add(set);
@@ -37,6 +39,6 @@ public class WorkoutExercise {
 
     public WorkoutExerciseDto toDto () {
         List<WorkoutSetDto> workoutSetDtos = sets.stream().map(WorkoutSet::toDto).toList();
-        return new WorkoutExerciseDto(id, workoutSetDtos, exercise);
+        return new WorkoutExerciseDto(id, workoutSetDtos, exercise.toDto());
     }
 }
