@@ -2,6 +2,7 @@ package ch.fhnw.fitnesscounter.controller.workout;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
+import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
 import ch.fhnw.fitnesscounter.service.workout.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -56,7 +57,7 @@ public class WorkoutController {
 
     @PostMapping("/{id}/exercise")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public WorkoutDto addExercise (@PathVariable Long id, @Valid @RequestBody ExerciseDto exercise, Principal principal) {
+    public WorkoutExerciseDto addExercise (@PathVariable Long id, @Valid @RequestBody ExerciseDto exercise, Principal principal) {
         return workoutService.addExercise(id, exercise, principal.getName());
     }
 }

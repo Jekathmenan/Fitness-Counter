@@ -2,6 +2,7 @@ package ch.fhnw.fitnesscounter.service.workout;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
+import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
@@ -115,7 +116,7 @@ public class WorkoutService {
         workoutRepository.save(w);
     }
 
-    public WorkoutDto addExercise (Long id, ExerciseDto exerciseDto, String email) {
+    public WorkoutExerciseDto addExercise (Long id, ExerciseDto exerciseDto, String email) {
         // Suche das passende Workout
         Workout workout = workoutRepository.findByIdAndEndTimeIsNull(id).orElseThrow(() -> new FitnessAPIException("", HttpStatus.NOT_FOUND));
 
@@ -136,6 +137,6 @@ public class WorkoutService {
         workoutExerciseRepository.save(workoutExercise);
         workout.addExercise(workoutExercise);
         workoutRepository.save(workout);
-        return workout.toDTO();
+        return workoutExercise.toDto();
     }
 }

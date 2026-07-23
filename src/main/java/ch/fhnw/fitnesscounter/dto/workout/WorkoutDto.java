@@ -14,7 +14,7 @@ public record WorkoutDto(
         @Nullable
         String name,
         @Nullable
-        UserResponse user,
+        UserResponse user, // TODO: Create a new DTO to return only necessary User data
         @Nullable
         LocalDateTime startTime,
         @Nullable
