@@ -1,12 +1,15 @@
 package ch.fhnw.fitnesscounter.model.coreData;
 
+import ch.fhnw.fitnesscounter.dto.auth.UserResponse;
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 @Table(name = "workouts")
 @NoArgsConstructor
+@Setter
+@Getter
 public class Workout {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +45,9 @@ public class Workout {
         exercise.setWorkout(this);
     }
 
-    public WorkoutDto toDTO()
-    {
-        List<ExerciseDto> exerciseDtos = exercises.stream().map(exercise -> exercise.getExercise().toDto()).toList();
+    public WorkoutDto toDTO() {
         List<WorkoutExerciseDto> workoutExercises = exercises.stream().map(WorkoutExercise::toDto).toList();
-
-        return new WorkoutDto(id, name, user, startTime, endTime, workoutExercises);
+        UserResponse userResponse = new UserResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
+        return new WorkoutDto(id, name, userResponse, startTime, endTime, workoutExercises);
     }
 }
