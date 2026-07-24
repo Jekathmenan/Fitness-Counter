@@ -38,6 +38,14 @@ public class WorkoutExercise {
         set.setWorkoutExercise(this);
     }
 
+    public Optional<WorkoutSet> findSetById (Long setId) {
+        return sets.stream().filter(set -> set.getId().equals(setId)).findFirst();
+    }
+
+    public void removeSet(Long setId) {
+        sets.removeIf(set -> set.getId().equals(setId));
+    }
+
     public WorkoutExerciseDto toDto () {
         List<WorkoutSetDto> workoutSetDtos = sets.stream().map(WorkoutSet::toDto).toList();
         return new WorkoutExerciseDto(id, workoutSetDtos, exercise.toDto());
