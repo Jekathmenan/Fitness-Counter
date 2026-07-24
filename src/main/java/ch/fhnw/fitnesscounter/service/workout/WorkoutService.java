@@ -3,11 +3,13 @@ package ch.fhnw.fitnesscounter.service.workout;
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
 import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
+import ch.fhnw.fitnesscounter.dto.workout.WorkoutSetDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
 import ch.fhnw.fitnesscounter.model.coreData.Workout;
 import ch.fhnw.fitnesscounter.model.coreData.WorkoutExercise;
+import ch.fhnw.fitnesscounter.model.coreData.WorkoutSet;
 import ch.fhnw.fitnesscounter.repository.ExerciseRepository;
 import ch.fhnw.fitnesscounter.repository.UserRepository;
 import ch.fhnw.fitnesscounter.repository.WorkoutExerciseRepository;
@@ -116,21 +118,28 @@ public class WorkoutService {
         workoutRepository.save(w);
     }
 
+    /**
+     *
+     * Diese Methode erlaubt as einfügen einer neuen TrainingsÜbung.
+     *
+     * @param id
+     * @param exerciseDto
+     * @param email
+     * @return
+     */
     public WorkoutExerciseDto addExercise (Long id, ExerciseDto exerciseDto, String email) {
         // Suche das passende Workout
-        Workout workout = workoutRepository.findByIdAndEndTimeIsNull(id).orElseThrow(() -> new FitnessAPIException("", HttpStatus.NOT_FOUND));
+        Workout workout = findWorkoutOrThrow(id, email);
 
-        // Prüfe, ob das Workout tatsächlich dem eingeloggten Benutzer gehört
-        if (!workout.getUser().getEmail().equals(email))
-            throw new FitnessAPIException("Keine Berechtigung für dieses Training", HttpStatus.FORBIDDEN);
-
-        //
+        // Prüfe, ob der Name der Übung leer ist und ob die Übung existiert
         if (exerciseDto.name() == null || exerciseDto.name().isBlank())
             throw new FitnessAPIException("Übungsname darf nicht leer sein.", HttpStatus.BAD_REQUEST);
 
+        // TODO: Neue Übung erstellen, wenn sie nicht existiert.
         Exercise exercise = exerciseRepository.findByName(exerciseDto.name()).
                 orElseThrow(() -> new FitnessAPIException("Übung existiert nicht.", HttpStatus.EXPECTATION_FAILED));
 
+        // Speichere die Trainingsübung
         WorkoutExercise workoutExercise = new WorkoutExercise();
         workoutExercise.setExercise(exercise);
 
@@ -138,5 +147,112 @@ public class WorkoutService {
         workout.addExercise(workoutExercise);
         workoutRepository.save(workout);
         return workoutExercise.toDto();
+    }
+
+    /**
+     *
+     * Diese Methode löscht eine Übung aus einer Trainingseinheit.
+     *
+     * @param workoutId
+     * @param exerciseId
+     * @param email
+     */
+    public void deleteExercise (Long workoutId, Long exerciseId, String email) {
+        Workout workout = findWorkoutOrThrow(workoutId , email);
+        workout.removeExercise(exerciseId);
+        workoutRepository.save(workout);
+    }
+
+    /**
+     *
+     * Diese Methode erlaubt dem Benutzer einen neuen Satz in die Übung eines laufenden Workouts einzufügen
+     *
+     * @param workoutExerciseId
+     * @param workoutSetDto
+     * @param email
+     * @return
+     */
+    public WorkoutExerciseDto addSet (Long workoutExerciseId, WorkoutSetDto workoutSetDto, String email) {
+        WorkoutExercise exercise = findWorkoutExerciseOrThrow(workoutExerciseId, email);
+
+        if (exercise.getWorkout().getEndTime() != null)
+            throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine weiteren Sätze hinzugefügt werden.", HttpStatus.FORBIDDEN);
+
+        WorkoutSet set = workoutSetDto.toEntity();
+
+        exercise.addSet(set);
+        workoutExerciseRepository.save(exercise);
+        return exercise.toDto();
+    }
+
+    public void updateSet (Long workoutExerciseId, Long setId, WorkoutSet newSet, String email) {
+        WorkoutExercise exercise = findWorkoutExerciseOrThrow(workoutExerciseId, email);
+
+
+        if (exercise.getWorkout().getEndTime() != null)
+            throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine Sätze verändert werden.", HttpStatus.FORBIDDEN);
+        WorkoutSet workoutSet = exercise.findSetById(setId)
+                .orElseThrow(() -> new FitnessAPIException("Satz nicht gefunden", HttpStatus.NOT_FOUND));
+
+        workoutSet.setReps(newSet.getReps());
+        workoutSet.setWeight(newSet.getWeight());
+
+        workoutExerciseRepository.save(exercise);
+
+    }
+
+    /**
+     *
+     * Diese Methode löscht den Satz aus einer Übung
+     *
+     * @param exerciseId
+     * @param setId
+     * @param email
+     */
+    public void deleteSet (Long exerciseId, Long setId, String email) {
+        WorkoutExercise exercise = findWorkoutExerciseOrThrow(exerciseId, email);
+        if (exercise.getWorkout().getEndTime() != null)
+            throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine Sätze gelöscht werden.", HttpStatus.FORBIDDEN);
+
+        exercise.removeSet(setId);
+        workoutExerciseRepository.save(exercise);
+    }
+
+    /**
+     *
+     * Dieser Hilfsmethode sucht die Übung. Falls die Übung nicht dem eingeloggten Benutzer gehört wirft sie eine Ausnahme.
+     *
+     * @param id
+     * @param email
+     * @return
+     */
+    private Workout findWorkoutOrThrow(Long id, String email) {
+        Workout workout = workoutRepository.findByIdAndEndTimeIsNull(id).orElseThrow(() -> new FitnessAPIException("", HttpStatus.NOT_FOUND));
+
+        // Prüfe, ob das Workout tatsächlich dem eingeloggten Benutzer gehört
+        if (!workout.getUser().getEmail().equals(email))
+            throw new FitnessAPIException("Keine Berechtigung für dieses Training", HttpStatus.FORBIDDEN);
+
+        return workout;
+    }
+
+    /**
+     *
+     * Diese Hilfsmethode findet die passende Trainingsübung und prüft, ob sie dem eingeloggten Benutzer gehört.
+     *
+     * @param workoutExerciseId
+     * @param email
+     * @return
+     */
+    private WorkoutExercise findWorkoutExerciseOrThrow (Long workoutExerciseId, String email) {
+        WorkoutExercise exercise = workoutExerciseRepository.findById(workoutExerciseId)
+                .orElseThrow(() -> new FitnessAPIException("Angegebene Übung nicht gefunden.", HttpStatus.NOT_FOUND));
+
+        // Prüfe, ob die Trainingsübung dem eingeloggten User gehört
+        User workoutUser = exercise.getWorkout().getUser();
+        if (!workoutUser.getEmail().equals(email))
+            throw new FitnessAPIException("Keine Berechtigung für dieses Training", HttpStatus.FORBIDDEN);
+
+        return exercise;
     }
 }
