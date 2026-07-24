@@ -105,4 +105,61 @@ public class WorkoutController {
     public WorkoutExerciseDto addExercise (@PathVariable Long id, @Valid @RequestBody ExerciseDto exercise, Principal principal) {
         return workoutService.addExercise(id, exercise, principal.getName());
     }
+
+    /**
+     *
+     * Diese Route entfernt eine Übung aus dem aktiven Training.
+     *
+     * @param workoutId
+     * @param exerciseId
+     * @param principal
+     */
+    @DeleteMapping("/{workoutId}/exercise/{exerciseId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void removeExercise (@PathVariable Long workoutId, @PathVariable Long exerciseId, Principal principal) {
+        workoutService.deleteExercise(workoutId, exerciseId, principal.getName());
+    }
+
+    /**
+     *
+     * Diese Route fügt einen neuen Satz zur Übung hinzu
+     *
+     * @param workoutExerciseId
+     * @param setDto
+     * @param principal
+     * @return
+     */
+    @PostMapping("/{workoutExerciseId}/set")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public WorkoutExerciseDto addSet (@PathVariable Long workoutExerciseId, @RequestBody WorkoutSetDto setDto, Principal principal) {
+        return workoutService.addSet(workoutExerciseId, setDto, principal.getName());
+    }
+
+    /**
+     *
+     * Diese Route ersetzt ein Satz mit einem neuen Satz.
+     *
+     * @param workoutExerciseId
+     * @param setDto
+     * @param principal
+     */
+    @PutMapping("/{workoutExerciseId}/set")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void updateSet (@PathVariable Long workoutExerciseId, @RequestBody WorkoutSetDto setDto, Principal principal) {
+        workoutService.updateSet(workoutExerciseId, setDto.id(), setDto.toEntity(), principal.getName());
+    }
+
+    /**
+     *
+     * Diese Route löscht eine Übung.
+     *
+     * @param workoutExerciseId
+     * @param setId
+     * @param principal
+     */
+    @DeleteMapping("/{workoutExerciseId}/set/{setId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void deleteSet (@PathVariable Long workoutExerciseId, @PathVariable Long setId, Principal principal) {
+        workoutService.deleteSet(workoutExerciseId, setId, principal.getName());
+    }
 }
