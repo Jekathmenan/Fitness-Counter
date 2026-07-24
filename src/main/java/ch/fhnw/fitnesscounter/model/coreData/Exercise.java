@@ -27,6 +27,7 @@ public class Exercise extends BaseEntity {
 
     private String description;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable (
             name = "exercise_body_parts",
@@ -35,6 +36,7 @@ public class Exercise extends BaseEntity {
     )
     private Set<BodyPart> trainedBodyParts = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable (
             name = "exercise_movement_type",

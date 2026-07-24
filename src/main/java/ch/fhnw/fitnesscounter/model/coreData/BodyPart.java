@@ -26,6 +26,7 @@ public class BodyPart extends BaseEntity  {
     @Column(nullable = true)
     private String description;
 
+    @Builder.Default
     @ManyToMany(mappedBy = "trainedBodyParts")
     private Set<Exercise> exercises = new HashSet<>();
 

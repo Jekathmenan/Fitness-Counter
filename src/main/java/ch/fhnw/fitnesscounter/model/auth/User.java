@@ -63,6 +63,7 @@ public class User extends BaseEntity implements UserDetails  {
     public boolean isEnabled() { return true; }
 
     // User braucht eine Liste mit all seinen Workouts, sodass die in der Historie angezeigt werden können
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<Workout> workouts = new ArrayList<>();
 }
