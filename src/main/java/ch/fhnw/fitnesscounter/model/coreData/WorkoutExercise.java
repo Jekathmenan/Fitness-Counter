@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name = "workout_exercise")
@@ -35,6 +36,14 @@ public class WorkoutExercise {
     public void addSet(WorkoutSet set) {
         sets.add(set);
         set.setWorkoutExercise(this);
+    }
+
+    public Optional<WorkoutSet> findSetById (Long setId) {
+        return sets.stream().filter(set -> set.getId().equals(setId)).findFirst();
+    }
+
+    public void removeSet(Long setId) {
+        sets.removeIf(set -> set.getId().equals(setId));
     }
 
     public WorkoutExerciseDto toDto () {

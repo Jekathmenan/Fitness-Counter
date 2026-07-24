@@ -19,7 +19,7 @@ public class BodyPartController {
 
     /**
      *
-     * Diese Methode gibt alle Körperteile/Muskeln zurück.
+     * Diese Route gibt alle Körperteile/Muskeln zurück.
      *
      * @return
      */
@@ -68,7 +68,7 @@ public class BodyPartController {
 
     /**
      *
-     * Mit dieser Methode kann ein Körperteil geändert werden.
+     * Mit dieser Route kann ein Körperteil geändert werden.
      *
      * @param id
      * @param bodyPartDto

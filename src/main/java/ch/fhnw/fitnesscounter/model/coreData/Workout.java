@@ -45,6 +45,10 @@ public class Workout {
         exercise.setWorkout(this);
     }
 
+    public void removeExercise (Long id) {
+        exercises.removeIf(exercise -> exercise.getId().equals(id));
+    }
+
     public WorkoutDto toDTO() {
         List<WorkoutExerciseDto> workoutExercises = exercises.stream().map(WorkoutExercise::toDto).toList();
         UserResponse userResponse = new UserResponse(user.getFirstName(), user.getLastName(), user.getEmail(), user.getRole().name());
