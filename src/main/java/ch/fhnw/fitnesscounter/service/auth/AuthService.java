@@ -43,13 +43,13 @@ public class AuthService {
         // Prüfe, ob Passwörter übereinstimmen
         if (!Objects.equals(registerRequest.password(), registerRequest.retypePassword())) {
             log.debug("Eingegeben Passwörter stimmen nicht überein. Betroffene E-Mail: {}", registerRequest.email());
-            throw new FitnessAPIException("Passwörter müssen übereinstimmen");
+            throw new FitnessAPIException("Passwörter müssen übereinstimmen", "password");
         }
 
         // Prüfe, ob die E-Mail-Adresse vergeben ist
         if (userService.findByEmail(registerRequest.email()).isPresent()) {
             log.warn("E-Mail ist bereits vergeben: {}", registerRequest.email());
-            throw new FitnessAPIException("E-Mail ist bereits vergeben");
+            throw new FitnessAPIException("E-Mail ist bereits vergeben", "email");
         }
 
         // Speichere den Benutzer in der Datenbank.
@@ -91,11 +91,11 @@ public class AuthService {
             return new LoginResponse(token, user.isResetPassword());
         } catch (BadCredentialsException ex) {
             log.warn("Login-Fehlschlag: Ungültiges Passwort für Konto {}", loginRequest.email());
-            throw ex;
+            throw new FitnessAPIException(ex.getMessage(), "password");
         }
         catch (Exception ex) {
             log.warn("Kritischer Fehler beim Login-Prozess für {}.", loginRequest.email(), ex);
-            throw ex;
+            throw new FitnessAPIException(ex.getMessage(), "password");
         }
     }
 

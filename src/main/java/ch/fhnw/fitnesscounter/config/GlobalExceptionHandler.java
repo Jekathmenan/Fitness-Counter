@@ -2,6 +2,7 @@ package ch.fhnw.fitnesscounter.config;
 
 import ch.fhnw.fitnesscounter.dto.error.ErrorDto;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -25,9 +26,9 @@ import java.util.Map;
  * erhält.
  *
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     /**
      *
@@ -37,14 +38,17 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAllUncaughtErrors(Exception ex) {
+    public ResponseEntity<ErrorDto> handleAllUncaughtErrors(Exception ex) {
         // Logge den Fehler
-        logger.error("Unerwarteter Fehler aufgetreten: ", ex);
+        log.error("Unerwarteter Fehler aufgetreten: ", ex);
 
         // Generische Meldung zurückgeben
         Map<String, String> error = new HashMap<>();
         error.put("error", "Ein interner Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+
+        ErrorDto errorResponse = new ErrorDto(LocalDateTime.now(), error, null);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
     /**
@@ -55,14 +59,17 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ErrorDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.badRequest().body(errors);
+
+        ErrorDto errorResponse = new ErrorDto(LocalDateTime.now(), errors, null);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     /**
@@ -73,20 +80,24 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredential (BadCredentialsException ex) {
+    public ResponseEntity<ErrorDto> handleBadCredential (BadCredentialsException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+
+        ErrorDto errorResponse = new ErrorDto(LocalDateTime.now(), error, null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     /**
      * Fängt allgemeine Sicherheitsfehler ab (z.B. Account gesperrt).
      */
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<Map<String, String>> handleAuthenticationException(AuthenticationException ex) {
+    public ResponseEntity<ErrorDto> handleAuthenticationException(AuthenticationException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", "Authentifizierung fehlgeschlagen: " + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+
+        ErrorDto errorResponse = new ErrorDto(LocalDateTime.now(), error, null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     /**
@@ -99,7 +110,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(FitnessAPIException.class)
     public ResponseEntity<ErrorDto> handleRuntime(FitnessAPIException ex) {
-        ErrorDto errorResponse = new ErrorDto(ex.getMessage(), LocalDateTime.now(), ex.getData());
+        ErrorDto errorResponse = new ErrorDto(LocalDateTime.now(), ex.getErrorMessages(), ex.getData());
 
         return ResponseEntity.status(ex.getStatus()).body(errorResponse);
     }
