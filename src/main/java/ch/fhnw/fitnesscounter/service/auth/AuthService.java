@@ -91,11 +91,11 @@ public class AuthService {
             return new LoginResponse(token, user.isResetPassword());
         } catch (BadCredentialsException ex) {
             log.warn("Login-Fehlschlag: Ungültiges Passwort für Konto {}", loginRequest.email());
-            throw new FitnessAPIException(ex.getMessage(), "password");
+            throw new FitnessAPIException("E-Mail-Adresse oder Passwort ist ungültig.", "password");
         }
         catch (Exception ex) {
             log.warn("Kritischer Fehler beim Login-Prozess für {}.", loginRequest.email(), ex);
-            throw new FitnessAPIException(ex.getMessage(), "password");
+            throw new FitnessAPIException("Ein unbekannter Fehler ist aufgetaucht. Wenden Sie sich an den Admin!", "password");
         }
     }
 
