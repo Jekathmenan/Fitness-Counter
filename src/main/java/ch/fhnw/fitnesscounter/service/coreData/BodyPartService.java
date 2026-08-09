@@ -31,7 +31,8 @@ public class BodyPartService {
                 .map(bp -> new BodyPartDto(
                         bp.getId(),
                         bp.getName(),
-                        bp.getDescription()
+                        bp.getDescription(),
+                        bp.getExercises().isEmpty()
                 )).toList();
     }
 
@@ -107,13 +108,16 @@ public class BodyPartService {
      * @param user
      */
     public void deleteBodyPart (long id, String user) {
+        BodyPart bodyPart = bodyPartsRepository.findById(id).orElseThrow(() -> {
+            log.warn("User {} tried to delete a non existing body part {}.", user, id);
+            return new FitnessAPIException("Body part not found.", HttpStatus.NOT_FOUND);
+        });
 
-        bodyPartsRepository.findById(id).ifPresentOrElse(
-                bodyPartsRepository::delete,
-                () -> {
-                    log.warn("User {} tried to delete a non existing body part {}.", user, id);
-                    throw new FitnessAPIException("Body part not found.", HttpStatus.NOT_FOUND);
-                }
-        );
+        // Körperteil nur löschen, wenn es nicht verwendet wird.
+        if (bodyPart.getExercises().isEmpty()) {
+            bodyPartsRepository.delete(bodyPart);
+        } else {
+            throw new FitnessAPIException("Cannot delete body part it is already being used.", HttpStatus.FORBIDDEN);
+        }
     }
 }
