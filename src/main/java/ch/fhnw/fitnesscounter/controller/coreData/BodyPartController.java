@@ -36,9 +36,8 @@ public class BodyPartController {
      * @return
      */
     @GetMapping("/{id}")
-    public List<BodyPartDto> getBodyPartById (@PathVariable Long id) {
-        return bodyPartService.getAllBodyParts();
-        // return bodyPartsRepository.findAll();
+    public BodyPartDto getBodyPartById (@PathVariable Long id, Principal principal) {
+        return bodyPartService.getBodyPartById(id, principal.getName());
     }
 
     /**
