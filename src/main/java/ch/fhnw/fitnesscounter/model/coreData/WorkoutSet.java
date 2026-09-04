@@ -21,7 +21,7 @@ public class WorkoutSet {
 
     @NotNull(message = "Gewicht muss vorgegeben werden.")
     private Double weight;
-
+    @NotNull(message = "Wiederholung muss vorgegeben sein und im korrekten Format sein.")
     private Integer reps;
     private Integer setOrder;
 
