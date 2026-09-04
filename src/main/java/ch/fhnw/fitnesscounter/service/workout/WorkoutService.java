@@ -1,9 +1,7 @@
 package ch.fhnw.fitnesscounter.service.workout;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutSetDto;
+import ch.fhnw.fitnesscounter.dto.workout.*;
 import ch.fhnw.fitnesscounter.exception.FitnessAPIException;
 import ch.fhnw.fitnesscounter.model.auth.User;
 import ch.fhnw.fitnesscounter.model.coreData.Exercise;
@@ -67,6 +65,55 @@ public class WorkoutService {
         return workoutRepository.findFirstByUserIdAndEndTimeIsNull(user.getId())
                 .map(Workout::toDTO)
                 .orElse(null);
+    }
+
+    /**
+     *
+     * Diese Methode gibt alle Übungen des aktiven Trainings zurück.
+     *
+     * @param email
+     * @return
+     */
+    public WorkoutExercisesListDto getActiveExercisesForUser(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new FitnessAPIException("User with email " + email + " not found.", HttpStatus.NOT_FOUND));
+
+        // Prüfe, ob User ein aktives Training hat
+        Workout workout = workoutRepository.findFirstByUserIdAndEndTimeIsNull(user.getId())
+                .orElse(null);
+        if (workout == null)
+            return new WorkoutExercisesListDto(List.of());
+
+        // Gebe alle Übungen des aktiven Trainings zurück
+        List<WorkoutExerciseDto> exercises = workout.getExercises().stream()
+                .map(WorkoutExercise::toDto)
+                .toList();
+
+        return new WorkoutExercisesListDto(exercises);
+    }
+
+    /**
+     *
+     * Diese Methode gibt alle Sätze einer Übung zurück
+     *
+     * @param email
+     * @param id
+     * @return
+     */
+    public WorkoutSetListDto getExercisesSets (String email, Long id) {
+        // Finde den user
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new FitnessAPIException("User with email " + email + " not found.", HttpStatus.NOT_FOUND));
+
+        // Lese die Übung mit der angegebenen Id aus.
+        WorkoutExercise exercise = workoutRepository.findFirstByUserIdAndEndTimeIsNull(user.getId()).orElseThrow(()-> new FitnessAPIException("Keine aktives Training am laufen!"))
+                .getExercises().stream().filter(ex -> ex.getId().equals(id))
+                // Wenn Übung nicht gefunden, Exception werfen
+                .findFirst().orElseThrow(() -> new FitnessAPIException("Übung mit der angegebenen Id nicht gefunden!"));
+
+        // Lese alle Sätze der ausgewählten Übung aus und gebe sie zurück
+        List<WorkoutSetDto> workoutSetListDto = exercise.getSets().stream().map(WorkoutSet::toDto).toList();
+        return new WorkoutSetListDto(workoutSetListDto);
     }
 
     /**
