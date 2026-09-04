@@ -127,18 +127,19 @@ public class WorkoutService {
     public WorkoutDto startWorkout (WorkoutDto workoutDto, String email) {
         User user = userRepository.findByEmail(email).orElseThrow(()-> new FitnessAPIException("Unknown Error occurred. Please contact a Server Admin.", HttpStatus.NOT_FOUND));
 
-        // Prüfe, ob der Benutzer bereits ein Workout gestartet hat.
+        // Prüfe, ob der Benutzer bereits ein Training gestartet hat.
         Optional<Workout> activeWorkout = workoutRepository.findFirstByUserIdAndEndTimeIsNull(user.getId());
-
         if(activeWorkout.isPresent())
             throw new FitnessAPIException("Es darf nur ein Training pro Benutzer gestartet werden.", HttpStatus.CONFLICT, activeWorkout.get());
 
+        // Starte neues Training
         Workout workout = new Workout();
         workout.setName(workoutDto.name());
         workout.setStartTime(LocalDateTime.now());
         workout.setUser(user);
-
         workoutRepository.save(workout);
+
+        // Gebe die neu erstellte Übung zurück
         return workout.toDTO();
     }
 
@@ -222,30 +223,37 @@ public class WorkoutService {
     public WorkoutExerciseDto addSet (Long workoutExerciseId, WorkoutSetDto workoutSetDto, String email) {
         WorkoutExercise exercise = findWorkoutExerciseOrThrow(workoutExerciseId, email);
 
+        // Prüfe, ob versucht wird, eine bereits geschlossene Übung zu bearbeiten
         if (exercise.getWorkout().getEndTime() != null)
             throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine weiteren Sätze hinzugefügt werden.", HttpStatus.FORBIDDEN);
 
+        // Füge einen neuen Satz zur Übung hinzu
         WorkoutSet set = workoutSetDto.toEntity();
-
         exercise.addSet(set);
         workoutExerciseRepository.save(exercise);
+
+        // Gebe die gesamte Übung zurück
         return exercise.toDto();
     }
 
-    public void updateSet (Long workoutExerciseId, Long setId, WorkoutSet newSet, String email) {
+    public WorkoutSetListDto updateSet (Long workoutExerciseId, Long setId, WorkoutSet newSet, String email) {
         WorkoutExercise exercise = findWorkoutExerciseOrThrow(workoutExerciseId, email);
 
-
+        // Prüfe, ob versucht wird ein bereits geschlossenes Training zu bearbeiten
         if (exercise.getWorkout().getEndTime() != null)
             throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine Sätze verändert werden.", HttpStatus.FORBIDDEN);
+
+        // Versuche den Satz zu finden
         WorkoutSet workoutSet = exercise.findSetById(setId)
                 .orElseThrow(() -> new FitnessAPIException("Satz nicht gefunden", HttpStatus.NOT_FOUND));
 
+        // Die Wiederholungen und Gewicht des Satzes speichern
         workoutSet.setReps(newSet.getReps());
         workoutSet.setWeight(newSet.getWeight());
-
         workoutExerciseRepository.save(exercise);
 
+        // Gebe alle Sätze der aktiven Übung zurück
+        return getExercisesSets(email, workoutExerciseId);
     }
 
     /**
@@ -258,9 +266,12 @@ public class WorkoutService {
      */
     public void deleteSet (Long exerciseId, Long setId, String email) {
         WorkoutExercise exercise = findWorkoutExerciseOrThrow(exerciseId, email);
+
+        // Prüfe, ob versucht wird, einen Satz eines geschlossenen Trainings zu löschen
         if (exercise.getWorkout().getEndTime() != null)
             throw new FitnessAPIException("Workout ist bereits beendet. Es dürfen keine Sätze gelöscht werden.", HttpStatus.FORBIDDEN);
 
+        // Entferne Satz aus der Übung
         exercise.removeSet(setId);
         workoutExerciseRepository.save(exercise);
     }
