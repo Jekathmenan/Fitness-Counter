@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     boolean existsByName(String name);
     Optional<Exercise> findByName(String name);
+    List<Exercise> findAllByOrderByIdDesc();
 }

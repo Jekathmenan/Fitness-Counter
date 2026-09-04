@@ -38,13 +38,14 @@ public class ExerciseService {
      * @return
      */
     public List<ExerciseDto> getAllExercises () {
-        return exerciseRepository.findAll().stream()
+        return exerciseRepository.findAllByOrderByIdDesc().stream()
                 .map(ex -> new ExerciseDto(
                         ex.getId(),
                         ex.getName(),
                         ex.getDescription(),
                         ex.getTrainedBodyPartsAsDto(),
-                        ex.getMovementTypesAsDto()
+                        ex.getMovementTypesAsDto(),
+                        ex.getWorkoutExercises().isEmpty()
                 ))
                 .toList();
     }

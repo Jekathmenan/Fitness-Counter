@@ -50,7 +50,7 @@ public class WorkoutService {
      */
     public List<WorkoutDto> getAllWorkoutsByUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new FitnessAPIException("Unknown Error occurred. Please contact a Server Admin.", HttpStatus.NOT_FOUND));
-        return workoutRepository.findByUserId(user.getId()).stream().map(Workout::toDTO).toList();
+        return workoutRepository.findByUserIdOrderByIdDesc(user.getId()).stream().map(Workout::toDTO).toList();
     }
 
     /**

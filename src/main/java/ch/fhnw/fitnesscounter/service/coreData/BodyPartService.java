@@ -26,7 +26,7 @@ public class BodyPartService {
      * @return
      */
     public List<BodyPartDto> getAllBodyParts () {
-        return bodyPartsRepository.findAll().stream()
+        return bodyPartsRepository.findAllByOrderByIdDesc().stream()
                 // mappe die gefundenen BodyParts zu BodyPartDtos
                 .map(bp -> new BodyPartDto(
                         bp.getId(),

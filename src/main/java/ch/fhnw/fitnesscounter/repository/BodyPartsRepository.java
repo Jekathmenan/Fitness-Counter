@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface BodyPartsRepository extends JpaRepository<BodyPart, Long> {
     boolean existsByNameIgnoreCase(String name);
     Optional<BodyPart> findByNameIgnoreCase(String name);
+    List<BodyPart> findAllByOrderByIdDesc();
 }
