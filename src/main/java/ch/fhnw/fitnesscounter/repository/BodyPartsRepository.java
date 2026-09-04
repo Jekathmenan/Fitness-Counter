@@ -3,10 +3,12 @@ package ch.fhnw.fitnesscounter.repository;
 import ch.fhnw.fitnesscounter.model.coreData.BodyPart;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface BodyPartsRepository extends JpaRepository<BodyPart, Long> {
     boolean existsByNameIgnoreCase(String name);
     Optional<BodyPart> findByNameIgnoreCase(String name);
+    List<BodyPart> findAllByOrderByIdDesc();
 }

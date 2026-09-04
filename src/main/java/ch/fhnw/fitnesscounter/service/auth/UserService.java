@@ -38,7 +38,7 @@ public class UserService {
     public User findByEmailOrThrow(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> {
             log.warn("Zugriffsversuch gescheitert: Benutzer {} nicht gefunden.", email);
-            return new FitnessAPIException("User nicht gefunden");
+            return new FitnessAPIException("E-Mail-Adresse oder Passwort ist ungültig.", "password");
         });
     }
 

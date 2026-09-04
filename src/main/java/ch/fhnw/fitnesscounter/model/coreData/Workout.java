@@ -38,6 +38,7 @@ public class Workout {
     private User user;
 
     @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id ASC")
     private List<WorkoutExercise> exercises = new ArrayList<>();
 
     public void addExercise (WorkoutExercise exercise) {

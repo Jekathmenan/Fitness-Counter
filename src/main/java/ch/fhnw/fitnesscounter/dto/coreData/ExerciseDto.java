@@ -17,6 +17,8 @@ public record ExerciseDto(
 
         @Nullable
         @JsonProperty("movements")
-        List<MovementTypeDto> movements
+        List<MovementTypeDto> movements,
+        @Nullable
+        Boolean unused
 ) {
 }

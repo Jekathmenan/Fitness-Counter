@@ -6,6 +6,7 @@ import ch.fhnw.fitnesscounter.dto.coreData.MovementTypeDto;
 import ch.fhnw.fitnesscounter.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,9 @@ public class Exercise extends BaseEntity {
     )
     private Set<MovementType> movementTypes = new HashSet<>();
 
+    @OneToMany(mappedBy = "exercise", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<WorkoutExercise> workoutExercises = new ArrayList<>();
 
     public List<BodyPartDto> getTrainedBodyPartsAsDto () {
         return trainedBodyParts.stream().map(BodyPartDto::fromEntity).toList();
@@ -55,6 +59,7 @@ public class Exercise extends BaseEntity {
     }
 
     public ExerciseDto toDto() {
-        return new ExerciseDto(id, name, description, getTrainedBodyPartsAsDto(), getMovementTypesAsDto());
+        boolean unused = workoutExercises == null || workoutExercises.isEmpty();
+        return new ExerciseDto(id, name, description, getTrainedBodyPartsAsDto(), getMovementTypesAsDto(), unused);
     }
 }

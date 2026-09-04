@@ -1,9 +1,7 @@
 package ch.fhnw.fitnesscounter.controller.workout;
 
 import ch.fhnw.fitnesscounter.dto.coreData.ExerciseDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutExerciseDto;
-import ch.fhnw.fitnesscounter.dto.workout.WorkoutSetDto;
+import ch.fhnw.fitnesscounter.dto.workout.*;
 import ch.fhnw.fitnesscounter.service.workout.WorkoutService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +60,33 @@ public class WorkoutController {
             return ResponseEntity.noContent().build();
 
         return ResponseEntity.ok(dto);
+    }
+
+    /**
+     *
+     * Diese Route gibt alle aktiven Übungen des aktiven Trainings zurück.
+     *
+     * @param principal
+     * @return
+     */
+    @GetMapping("/active/exercises")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<WorkoutExercisesListDto> getActiveExercises (Principal principal) {
+        return ResponseEntity.ok(workoutService.getActiveExercisesForUser(principal.getName()));
+    }
+
+    /**
+     *
+     * Diese Route gibt alle Sätze des aktiven Trainings und der verlangten Übung zurück.
+     *
+     * @param id
+     * @param principal
+     * @return
+     */
+    @GetMapping("/active/exercise/{id}/sets")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<WorkoutSetListDto> getExercisesSets (@PathVariable Long id, Principal principal) {
+        return ResponseEntity.ok(workoutService.getExercisesSets(principal.getName(), id));
     }
 
     /**
@@ -145,8 +170,8 @@ public class WorkoutController {
      */
     @PutMapping("/{workoutExerciseId}/set")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void updateSet (@PathVariable Long workoutExerciseId, @RequestBody WorkoutSetDto setDto, Principal principal) {
-        workoutService.updateSet(workoutExerciseId, setDto.id(), setDto.toEntity(), principal.getName());
+    public ResponseEntity<WorkoutSetListDto> updateSet (@PathVariable Long workoutExerciseId, @RequestBody WorkoutSetDto setDto, Principal principal) {
+        return ResponseEntity.ok(workoutService.updateSet(workoutExerciseId, setDto.id(), setDto.toEntity(), principal.getName()));
     }
 
     /**

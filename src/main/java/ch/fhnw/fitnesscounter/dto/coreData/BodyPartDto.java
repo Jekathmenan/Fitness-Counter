@@ -12,11 +12,13 @@ public record BodyPartDto(
         @Pattern(regexp = "^[a-zA-ZÀ-ÿ]+$", message = "Ungültige Zeichen. Nur Buchstaben erlaubt")
         @Size(min = 2, max = 255)
         String name,
-        String description
+        String description,
+        @Nullable
+        Boolean unused
 ) {
         public static BodyPartDto fromEntity(BodyPart bodyPart) {
                 if (bodyPart == null) return null;
-                return new BodyPartDto(bodyPart.getId(), bodyPart.getName(), bodyPart.getDescription());
+                return new BodyPartDto(bodyPart.getId(), bodyPart.getName(), bodyPart.getDescription(), bodyPart.getExercises().isEmpty());
 
         }
 }
