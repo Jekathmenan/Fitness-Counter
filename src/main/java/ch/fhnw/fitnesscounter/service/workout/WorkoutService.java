@@ -187,13 +187,20 @@ public class WorkoutService {
         Exercise exercise = exerciseRepository.findByName(exerciseDto.name()).
                 orElseThrow(() -> new FitnessAPIException("Übung existiert nicht.", HttpStatus.EXPECTATION_FAILED));
 
-        // Speichere die Trainingsübung
+        // Erstelle neue Trainingsübung und Speichere sie
         WorkoutExercise workoutExercise = new WorkoutExercise();
         workoutExercise.setExercise(exercise);
+
+        // Füge einen leeren Satz zur Übung
+        WorkoutSet set = new WorkoutSet();
+        set.setReps(0);
+        set.setWeight(0.0);
+        workoutExercise.addSet(set);
 
         workoutExerciseRepository.save(workoutExercise);
         workout.addExercise(workoutExercise);
         workoutRepository.save(workout);
+
         return workoutExercise.toDto();
     }
 
