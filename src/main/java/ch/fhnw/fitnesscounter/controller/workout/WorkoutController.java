@@ -176,7 +176,7 @@ public class WorkoutController {
 
     /**
      *
-     * Diese Route löscht eine Übung.
+     * Diese Route löscht einen Satz.
      *
      * @param workoutExerciseId
      * @param setId
@@ -184,7 +184,7 @@ public class WorkoutController {
      */
     @DeleteMapping("/{workoutExerciseId}/set/{setId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void deleteSet (@PathVariable Long workoutExerciseId, @PathVariable Long setId, Principal principal) {
-        workoutService.deleteSet(workoutExerciseId, setId, principal.getName());
+    public ResponseEntity<WorkoutSetListDto> deleteSet (@PathVariable Long workoutExerciseId, @PathVariable Long setId, Principal principal) {
+        return ResponseEntity.ok(workoutService.deleteSet(workoutExerciseId, setId, principal.getName()));
     }
 }

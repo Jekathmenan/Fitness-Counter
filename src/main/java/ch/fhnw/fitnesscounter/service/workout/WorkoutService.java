@@ -271,7 +271,7 @@ public class WorkoutService {
      * @param setId
      * @param email
      */
-    public void deleteSet (Long exerciseId, Long setId, String email) {
+    public WorkoutSetListDto deleteSet (Long exerciseId, Long setId, String email) {
         WorkoutExercise exercise = findWorkoutExerciseOrThrow(exerciseId, email);
 
         // Prüfe, ob versucht wird, einen Satz eines geschlossenen Trainings zu löschen
@@ -281,6 +281,9 @@ public class WorkoutService {
         // Entferne Satz aus der Übung
         exercise.removeSet(setId);
         workoutExerciseRepository.save(exercise);
+
+        // Gebe alle Sätze der aktiven Übung zurück
+        return getExercisesSets(email, exerciseId);
     }
 
     /**
