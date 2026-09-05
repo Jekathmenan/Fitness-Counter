@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -39,6 +41,20 @@ public class WorkoutService {
      */
     public List<WorkoutDto> getAllWorkouts () {
         return workoutRepository.findAll().stream().map(Workout::toDTO).toList();
+    }
+
+    /**
+     *
+     * Diese Methode gibt ein einziges Workout als DTOs zurück
+     *
+     * @return
+     */
+    public WorkoutDto getWorkoutById(Long id, String email) {
+        return workoutRepository.findByIdAndUserEmail(id, email)
+                .map(Workout::toDTO)
+                .orElseThrow(() -> new FitnessAPIException(
+                        "Workout nicht gefunden oder Zugriff verweigert.",
+                        HttpStatus.NOT_FOUND));
     }
 
     /**

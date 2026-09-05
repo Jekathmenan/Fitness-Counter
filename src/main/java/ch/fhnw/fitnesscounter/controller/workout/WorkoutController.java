@@ -46,6 +46,18 @@ public class WorkoutController {
 
     /**
      *
+     * Diese Route gibt ein Workout nach angegebener Id zurück
+     *
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public WorkoutDto getWorkoutById (@PathVariable Long id, Principal principal) {
+        return workoutService.getWorkoutById(id, principal.getName());
+    }
+
+    /**
+     *
      * Diese Route gibt das aktive Workout des aktuellen Benutzers zurück.
      *
      * @param principal

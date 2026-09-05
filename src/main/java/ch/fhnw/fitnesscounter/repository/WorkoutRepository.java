@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface WorkoutRepository extends JpaRepository<Workout, Long>  {
     List<Workout> findByUserId(Long userId);
+    Optional<Workout> findByIdAndUserEmail(Long id, String email);
     List<Workout> findByUserIdOrderByIdDesc(Long userId);
     Optional<Workout> findByIdAndEndTimeIsNull(Long userId);
     Optional<Workout> findFirstByUserIdAndEndTimeIsNull(Long userId);
